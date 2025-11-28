@@ -1,0 +1,7 @@
+[build]
+builder = "Nixpacks"
+buildCommand = "dotnet publish SIMS/SIMS.csproj -c Release -o out"
+
+[deploy]
+startCommand = "dotnet out/SIMS.dll"
+restartPolicy = "on_failure"
