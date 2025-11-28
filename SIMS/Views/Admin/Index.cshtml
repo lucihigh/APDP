@@ -1,0 +1,103 @@
+@model SIMS.Models.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<section class="p-4 p-lg-5 mb-4 rounded-3 bg-light border admin-hero">
+    <div class="container-fluid py-2">
+        <h1 class="display-6 fw-bold mb-2"><i class="bi bi-gear-wide-connected text-primary me-2"></i> Administration</h1>
+        <p class="text-secondary m-0">Manage users, courses, enrollments and run system tools.</p>
+        <div class="d-flex flex-wrap gap-2 mt-3">
+            <a class="btn btn-primary" asp-controller="Students" asp-action="Index"><i class="bi bi-people-fill me-1"></i> Manage Students</a>
+            <a class="btn btn-outline-primary" asp-controller="Courses" asp-action="Index"><i class="bi bi-journal-bookmark-fill me-1"></i> Manage Courses</a>
+            <a class="btn btn-outline-primary" asp-controller="Enrollments" asp-action="Index"><i class="bi bi-card-checklist me-1"></i> Manage Enrollments</a>
+            <a class="btn btn-outline-primary" asp-controller="Assessments" asp-action="Index"><i class="bi bi-file-earmark-text me-1"></i> Assessments</a>
+            <a class="btn btn-outline-primary" asp-controller="ClassSessions" asp-action="Index"><i class="bi bi-calendar4-week me-1"></i> Sessions</a>
+            <a class="btn btn-outline-secondary" asp-controller="Reports" asp-action="Index"><i class="bi bi-graph-up me-1"></i> Reports</a>
+            <a class="btn btn-outline-secondary" asp-controller="Admin" asp-action="Faculty"><i class="bi bi-mortarboard-fill me-1"></i> Faculty</a>
+        </div>
+    </div>
+    </section>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-secondary">Students</div>
+                    <div class="display-6 fw-bold">@Model.Students</div>
+                </div>
+                <i class="bi bi-people-fill text-primary fs-1"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-secondary">Faculty</div>
+                    <div class="display-6 fw-bold">@Model.Faculty</div>
+                </div>
+                <i class="bi bi-mortarboard-fill text-success fs-1"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-secondary">Courses</div>
+                    <div class="display-6 fw-bold">@Model.Courses</div>
+                </div>
+                <i class="bi bi-journal-bookmark-fill text-success fs-1"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-secondary">Enrollments</div>
+                    <div class="display-6 fw-bold">@Model.Enrollments</div>
+                </div>
+                <i class="bi bi-card-checklist text-info fs-1"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-transparent fw-semibold"><i class="bi bi-tools me-2"></i>Admin Tools</div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6 col-lg-3">
+                <div class="p-3 border rounded h-100">
+                    <div class="fw-semibold mb-2"><i class="bi bi-person-plus-fill me-2"></i>Create Student Account</div>
+                    <p class="text-secondary small">Create a new student user and profile.</p>
+                    <a class="btn btn-sm btn-primary" asp-controller="Students" asp-action="Create">Create Student</a>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="p-3 border rounded h-100">
+                    <div class="fw-semibold mb-2"><i class="bi bi-key-fill me-2"></i>Reset Student Password</div>
+                    <p class="text-secondary small">Reset password for an existing account.</p>
+                    <a class="btn btn-sm btn-outline-primary" asp-action="ResetPassword">Reset Password</a>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="p-3 border rounded h-100">
+                    <div class="fw-semibold mb-2"><i class="bi bi-file-earmark-arrow-up me-2"></i>Import Students (CSV)</div>
+                    <p class="text-secondary small">Bulk create/update student accounts.</p>
+                    <a class="btn btn-sm btn-outline-primary" asp-action="ImportStudents">Import CSV</a>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="p-3 border rounded h-100">
+                    <div class="fw-semibold mb-2"><i class="bi bi-filetype-csv me-2"></i>Export Students</div>
+                    <p class="text-secondary small">Download all students as CSV.</p>
+                    <a class="btn btn-sm btn-outline-secondary" asp-action="ExportStudents" data-shell="off">Export CSV</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

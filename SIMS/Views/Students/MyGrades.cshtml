@@ -1,0 +1,27 @@
+@model IEnumerable<SIMS.Models.Enrollment>
+@{
+    ViewData["Title"] = "My Grades";
+}
+<h1>My Grades</h1>
+<table class="table table-striped table-hover align-middle">
+    <thead>
+        <tr>
+            <th>Course</th>
+            <th>Name</th>
+            <th>Semester</th>
+            <th>Grade</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var e in Model)
+    {
+        <tr>
+            <td>@e.Course?.Code</td>
+            <td>@e.Course?.Name</td>
+            <td>@e.Semester</td>
+            <td>@(string.IsNullOrEmpty(e.Grade) ? "Pending" : e.Grade)</td>
+        </tr>
+    }
+    </tbody>
+</table>
+

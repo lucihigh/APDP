@@ -1,0 +1,54 @@
+@model IEnumerable<SIMS.Models.FacultyProfile>
+@{
+    ViewData["Title"] = "Faculty";
+    var q = ViewData["q"] as string;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <div class="page-header-title mb-1">Faculty</div>
+        <div class="page-header-subtitle">Manage faculty profiles and linked accounts.</div>
+    </div>
+    <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-lg me-1"></i> Add faculty</a>
+</div>
+
+<form method="get" class="mb-3">
+    <div class="input-group">
+        <input type="text" class="form-control" placeholder="Search by name, email, or department" name="q" value="@q" />
+        <button class="btn btn-outline-secondary" type="submit">Search</button>
+    </div>
+</form>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Department</th>
+                    <th>Phone</th>
+                    <th>UserId</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.FullName</td>
+                        <td>@item.Email</td>
+                        <td>@item.Department</td>
+                        <td>@item.Phone</td>
+                        <td class="font-monospace">@item.UserId</td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">No faculty found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

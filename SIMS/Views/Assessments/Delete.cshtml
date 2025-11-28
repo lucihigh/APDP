@@ -1,0 +1,55 @@
+@model SIMS.Models.Assessment
+
+@{
+    ViewData["Title"] = "Delete assessment";
+}
+
+<div class="page-header mb-3">
+    <div class="page-header-title text-danger d-flex align-items-center gap-2">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        Delete assessment
+    </div>
+    <div class="page-header-subtitle">Are you sure you want to remove this assessment?</div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="d-flex flex-wrap justify-content-between align-items-start mb-3 gap-3">
+            <div>
+                <div class="text-secondary small">Assessment</div>
+                <div class="h5 mb-1">@Model.Title</div>
+                <div class="text-secondary small">Course: @Model.Course?.Code</div>
+            </div>
+            <span class="badge bg-danger-subtle text-danger px-3 py-2">
+                <i class="bi bi-calendar2-x me-1"></i>@(Model.DueDate?.ToString("yyyy-MM-dd") ?? "No due date")
+            </span>
+        </div>
+
+        <dl class="row g-3 mb-0">
+            <dt class="col-sm-3 text-secondary">Title</dt>
+            <dd class="col-sm-9 fw-semibold">@Model.Title</dd>
+
+            <dt class="col-sm-3 text-secondary">Description</dt>
+            <dd class="col-sm-9 text-muted">@Model.Description</dd>
+
+            <dt class="col-sm-3 text-secondary">Due date</dt>
+            <dd class="col-sm-9 fw-semibold">@Model.DueDate?.ToString("yyyy-MM-dd")</dd>
+
+            <dt class="col-sm-3 text-secondary">Attachment</dt>
+            <dd class="col-sm-9 fw-semibold">@Model.AttachmentPath</dd>
+
+            <dt class="col-sm-3 text-secondary">Course</dt>
+            <dd class="col-sm-9 fw-semibold">@Model.Course?.Code</dd>
+        </dl>
+
+        <form asp-action="Delete" class="mt-4 d-flex gap-2 align-items-center">
+            <input type="hidden" asp-for="Id" />
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash-fill me-1"></i> Delete
+            </button>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to list
+            </a>
+        </form>
+    </div>
+</div>

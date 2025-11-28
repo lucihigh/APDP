@@ -1,0 +1,51 @@
+@model SIMS.Models.FacultyProfile
+@{
+    ViewData["Title"] = "Faculty details";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <div class="page-header-title mb-1">Faculty details</div>
+        <div class="page-header-subtitle">@Model.FullName</div>
+    </div>
+    <a class="btn btn-outline-secondary" asp-action="Index">Back to list</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="fw-semibold text-muted small">Full name</div>
+                <div class="fs-5">@Model.FullName</div>
+            </div>
+            <div class="col-md-6">
+                <div class="fw-semibold text-muted small">Date of birth</div>
+                <div>@(Model.DateOfBirth?.ToString("yyyy-MM-dd") ?? "—")</div>
+            </div>
+            <div class="col-md-6">
+                <div class="fw-semibold text-muted small">Email</div>
+                <div>@Model.Email</div>
+            </div>
+            <div class="col-md-6">
+                <div class="fw-semibold text-muted small">Phone</div>
+                <div>@Model.Phone</div>
+            </div>
+            <div class="col-md-6">
+                <div class="fw-semibold text-muted small">Address</div>
+                <div>@Model.Address</div>
+            </div>
+            <div class="col-md-6">
+                <div class="fw-semibold text-muted small">Department</div>
+                <div>@Model.Department</div>
+            </div>
+            <div class="col-md-6">
+                <div class="fw-semibold text-muted small">Title</div>
+                <div>@Model.Title</div>
+            </div>
+            <div class="col-md-6">
+                <div class="fw-semibold text-muted small">User Id</div>
+                <div class="font-monospace">@Model.UserId</div>
+            </div>
+        </div>
+    </div>
+</div>
