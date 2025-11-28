@@ -1,0 +1,10 @@
+@{
+    ViewData["Title"] = "Student Created";
+}
+<div class="alert alert-success">Student account successfully created.</div>
+@if (ViewData["GeneratedPassword"] != null)
+{
+    <p><strong>Generated Password:</strong> @ViewData["GeneratedPassword"]</p>
+}
+<a asp-action="Index" class="btn btn-primary">Back to Admin</a>
+

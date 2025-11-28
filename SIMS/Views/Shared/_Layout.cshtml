@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SIMS</title>
+    <script type="importmap"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <!-- Fallback CDN in case local static files aren't served -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="d-flex flex-column min-vh-100"><a href="#main" class="visually-hidden-focusable">Skip to main content</a>
+    <header>
+        <nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom shadow-sm sticky-top" data-app-shell="true">
+            <div class="container-fluid">
+                <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-mortarboard-fill me-1 text-primary"></i> SIMS
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1 gap-lg-1" data-app-nav="true">
+                        <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Students" asp-action="Index">Students</a></li>
+                            <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Courses" asp-action="Index">Courses</a></li>
+                            <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Enrollments" asp-action="Index">Enrollments</a></li>
+                            <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Assessments" asp-action="Index">Assessments</a></li>
+                            <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="ClassSessions" asp-action="Index">Sessions</a></li>
+                        }
+                        else if (User.IsInRole("Faculty"))
+                        {
+                            <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Courses" asp-action="Index">Courses</a></li>
+                            <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Enrollments" asp-action="Index">Enrollments</a></li>
+                            <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Reports" asp-action="Index">Reports</a></li>
+                        }
+                        else if (User.IsInRole("Student"))
+                        {
+                            <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Students" asp-action="MyProfile">My Profile</a></li>
+                            <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Students" asp-action="UpdateProfile">Update Profile</a></li>
+                            <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Students" asp-action="MyGrades">Grades</a></li>
+                            <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Students" asp-action="MyTimetable">Timetable</a></li>
+                        }
+
+                        <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></li>
+                    </ul><div class="d-flex align-items-center gap-2"><a class="btn btn-sm btn-outline-primary me-2" data-app-link="true" asp-controller="Notifications" asp-action="Index"><i class="bi bi-bell"></i> Notifications</a>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a class="btn btn-sm btn-outline-success" data-app-link="true" asp-controller="Admin" asp-action="Index"><i class="bi bi-gear"></i> Admin</a>
+                        }
+                        <partial name="_LoginPartial" />
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container-fluid px-4 flex-grow-1">
+        <main id="main" role="main" class="pb-3 flex-grow-1 page-shell">
+            <partial name="_Alerts" />
+            @RenderBody()
+        </main>
+    </div>
+
+    <partial name="_AppFooter" />
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Fallback CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+
+
+

@@ -1,0 +1,18 @@
+@model IEnumerable<SIMS.Models.Student>
+@{
+    ViewData["Title"] = "Class List";
+    var course = (SIMS.Models.Course)ViewData["Course"]!;
+}
+<h1>Class List - @course.Code @course.Name</h1>
+<table class="table table-striped table-hover align-middle">
+    <thead><tr><th>Name</th><th>Email</th><th>Program</th><th>Year</th></tr></thead>
+    <tbody>
+    @foreach (var s in Model)
+    {
+        <tr>
+            <td>@s.FullName</td><td>@s.Email</td><td>@s.Program</td><td>@s.Year</td>
+        </tr>
+    }
+    </tbody>
+</table>
+

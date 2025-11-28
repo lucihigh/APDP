@@ -1,0 +1,81 @@
+@model IEnumerable<SIMS.Models.Course>
+
+@{
+    ViewData["Title"] = "Courses";
+}
+
+<div class="page-header d-flex flex-wrap align-items-center justify-content-between gap-2">
+    <div>
+        <div class="page-header-title">Courses</div>
+        <div class="page-header-subtitle">Browse and manage all available courses.</div>
+    </div>
+    <div class="d-flex gap-2">
+        <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-lg me-1"></i> New course</a>
+    </div>
+</div>
+<form method="get" class="row g-2 mb-3" role="search" aria-label="Search courses">
+    <div class="col-auto">
+        <input class="form-control" type="search" name="q" value="@((string?)ViewData["q"])" placeholder="Search code, name, department" />
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-outline-secondary" type="submit">Search</button>
+    </div>
+</form>
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+<div class="table-responsive">
+<table class="table table-striped table-hover align-middle mb-0">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Code)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Credits)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Department)
+            </th>
+            <th class="text-end">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Code)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Credits)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Department)
+            </td>
+            <td class="text-end table-actions">
+                <div class="d-inline-flex gap-2 action-group">
+                    <a class="btn btn-sm btn-outline-info" asp-action="Details" asp-route-id="@item.Id">
+                        <i class="bi bi-info-circle me-1"></i>Details
+                    </a>
+                    <a class="btn btn-sm btn-outline-secondary" asp-action="ClassList" asp-route-id="@item.Id">
+                        <i class="bi bi-people-fill me-1"></i>Class list
+                    </a>
+                    <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@item.Id">
+                        <i class="bi bi-trash me-1"></i>Delete
+                    </a>
+                </div>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+</div>
+    </div>
+</div>
+
+
