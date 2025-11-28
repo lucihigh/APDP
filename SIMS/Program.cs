@@ -55,20 +55,11 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Static assets must be reachable by anonymous users (e.g. login page CSS/JS)
-// even though the app uses an authorization fallback policy.
-var staticAssets = app.MapStaticAssets();
-staticAssets.AllowAnonymous();
-
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets()
-    .AllowAnonymous();
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.MapRazorPages()
-   .WithStaticAssets()
-   .AllowAnonymous();
+app.MapRazorPages();
 
 // Seed roles and an admin user
 await SIMS.Data.SeedData.InitializeAsync(app.Services);
