@@ -15,6 +15,17 @@ public static class SeedData
 
         await db.Database.MigrateAsync();
 
+        // Remove orphaned user-role links to avoid FK violations when roles/users are recreated
+        var existingUserIds = new HashSet<string>(await db.Users.Select(u => u.Id).ToListAsync(), StringComparer.OrdinalIgnoreCase);
+        var orphanUserRoles = await db.UserRoles
+            .Where(ur => !existingUserIds.Contains(ur.UserId))
+            .ToListAsync();
+        if (orphanUserRoles.Count > 0)
+        {
+            db.UserRoles.RemoveRange(orphanUserRoles);
+            await db.SaveChangesAsync();
+        }
+
         var roles = new[]
         {
             new IdentityRole { Id = RoleConstants.AdminId, Name = RoleConstants.AdminName, NormalizedName = RoleConstants.AdminName.ToUpperInvariant() },
