@@ -6,7 +6,7 @@ services:
     name: sims-web
     rootDir: .
     plan: free
-    dockerfilePath: SIMS/Dockerfile
+    dockerfilePath: Dockerfile
     envVars:
       - key: DatabaseProvider
         value: Postgres
