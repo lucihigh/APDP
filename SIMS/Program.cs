@@ -7,6 +7,7 @@ using Microsoft.Data.Sqlite;
 var builder = WebApplication.CreateBuilder(args);
 // If a hosting platform provides PORT, bind to it; otherwise let launchSettings/applicationUrl pick the port
 var port = Environment.GetEnvironmentVariable("PORT");
+var databaseProvider = builder.Configuration["DatabaseProvider"];
 if (!string.IsNullOrWhiteSpace(port))
 {
     builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
@@ -32,7 +33,16 @@ if (string.Equals(builder.Environment.EnvironmentName, "IntegrationTesting", Str
 else
 {
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlServer(connectionString));
+    {
+        if (string.Equals(databaseProvider, "Postgres", StringComparison.OrdinalIgnoreCase))
+        {
+            options.UseNpgsql(connectionString);
+        }
+        else
+        {
+            options.UseSqlServer(connectionString);
+        }
+    });
 }
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 

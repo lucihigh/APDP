@@ -60,33 +60,33 @@ public class ApplicationDbContext : IdentityDbContext
             .HasConversion(dateOnlyConverter)
             .HasColumnType("date");
 
-        // Adjust Identity key lengths for SQL Server composite indexes
+        // Keep Identity key lengths compatible across providers (SQL Server/Postgres)
         builder.Entity<IdentityRole>(b =>
         {
-            b.Property(r => r.Id).HasColumnType("nvarchar(128)").HasMaxLength(128);
-            b.Property(r => r.NormalizedName).HasColumnType("nvarchar(256)").HasMaxLength(256);
+            b.Property(r => r.Id).HasMaxLength(128);
+            b.Property(r => r.NormalizedName).HasMaxLength(256);
         });
         builder.Entity<IdentityUser>(b =>
         {
-            b.Property(u => u.Id).HasColumnType("nvarchar(128)").HasMaxLength(128);
-            b.Property(u => u.NormalizedUserName).HasColumnType("nvarchar(256)").HasMaxLength(256);
-            b.Property(u => u.NormalizedEmail).HasColumnType("nvarchar(256)").HasMaxLength(256);
+            b.Property(u => u.Id).HasMaxLength(128);
+            b.Property(u => u.NormalizedUserName).HasMaxLength(256);
+            b.Property(u => u.NormalizedEmail).HasMaxLength(256);
         });
         builder.Entity<IdentityUserLogin<string>>(b =>
         {
-            b.Property(l => l.LoginProvider).HasColumnType("nvarchar(128)").HasMaxLength(128);
-            b.Property(l => l.ProviderKey).HasColumnType("nvarchar(128)").HasMaxLength(128);
+            b.Property(l => l.LoginProvider).HasMaxLength(128);
+            b.Property(l => l.ProviderKey).HasMaxLength(128);
         });
         builder.Entity<IdentityUserRole<string>>(b =>
         {
-            b.Property(ur => ur.UserId).HasColumnType("nvarchar(128)").HasMaxLength(128);
-            b.Property(ur => ur.RoleId).HasColumnType("nvarchar(128)").HasMaxLength(128);
+            b.Property(ur => ur.UserId).HasMaxLength(128);
+            b.Property(ur => ur.RoleId).HasMaxLength(128);
         });
         builder.Entity<IdentityUserToken<string>>(b =>
         {
-            b.Property(t => t.UserId).HasColumnType("nvarchar(128)").HasMaxLength(128);
-            b.Property(t => t.LoginProvider).HasColumnType("nvarchar(128)").HasMaxLength(128);
-            b.Property(t => t.Name).HasColumnType("nvarchar(128)").HasMaxLength(128);
+            b.Property(t => t.UserId).HasMaxLength(128);
+            b.Property(t => t.LoginProvider).HasMaxLength(128);
+            b.Property(t => t.Name).HasMaxLength(128);
         });
 
         builder.Entity<Course>()

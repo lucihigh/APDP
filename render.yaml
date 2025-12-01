@@ -1,0 +1,18 @@
+databases:
+  - name: sims-postgres
+
+services:
+  - type: web
+    name: sims-web
+    rootDir: .
+    plan: free
+    dockerfilePath: SIMS/Dockerfile
+    envVars:
+      - key: DatabaseProvider
+        value: Postgres
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: sims-postgres
+          property: connectionString
+      - key: DOTNET_ENVIRONMENT
+        value: Production
