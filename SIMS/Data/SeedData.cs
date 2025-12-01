@@ -63,6 +63,55 @@ public static class SeedData
             }
         }
 
+        // Restore missing Identity users for students/faculty whose UserId exists in domain tables but not in AspNetUsers
+        existingUserIds = new HashSet<string>(await db.Users.Select(u => u.Id).ToListAsync(), StringComparer.OrdinalIgnoreCase);
+        var studentRoleExists = await roleManager.RoleExistsAsync(RoleConstants.StudentName);
+        var facultyRoleExists = await roleManager.RoleExistsAsync(RoleConstants.FacultyName);
+
+        var missingStudents = await db.Students
+            .Where(s => s.UserId != null && !existingUserIds.Contains(s.UserId!))
+            .ToListAsync();
+        foreach (var s in missingStudents)
+        {
+            var email = string.IsNullOrWhiteSpace(s.Email) ? $"{s.UserId!.ToLowerInvariant()}@restored.local" : s.Email;
+            var username = email;
+            var newUser = new IdentityUser
+            {
+                Id = s.UserId!,
+                UserName = username,
+                Email = email,
+                EmailConfirmed = true
+            };
+
+            var createResult = await userManager.CreateAsync(newUser, "Student#12345");
+            if (createResult.Succeeded && studentRoleExists)
+            {
+                await userManager.AddToRoleAsync(newUser, RoleConstants.StudentName);
+            }
+        }
+
+        var missingFaculty = await db.FacultyProfiles
+            .Where(f => f.UserId != null && !existingUserIds.Contains(f.UserId!))
+            .ToListAsync();
+        foreach (var f in missingFaculty)
+        {
+            var email = string.IsNullOrWhiteSpace(f.Email) ? $"{f.UserId!.ToLowerInvariant()}@restored.local" : f.Email;
+            var username = email;
+            var newUser = new IdentityUser
+            {
+                Id = f.UserId!,
+                UserName = username,
+                Email = email,
+                EmailConfirmed = true
+            };
+
+            var createResult = await userManager.CreateAsync(newUser, "Faculty#12345");
+            if (createResult.Succeeded && facultyRoleExists)
+            {
+                await userManager.AddToRoleAsync(newUser, RoleConstants.FacultyName);
+            }
+        }
+
         var adminEmail = "admin@sims.local";
         var adminUser = await userManager.FindByNameAsync("admin")
                          ?? await userManager.Users.FirstOrDefaultAsync(u => u.Email == adminEmail);
