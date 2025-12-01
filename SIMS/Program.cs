@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SIMS.Data;
 using Microsoft.Data.Sqlite;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 // If a hosting platform provides PORT, bind to it; otherwise let launchSettings/applicationUrl pick the port
@@ -14,7 +15,44 @@ if (!string.IsNullOrWhiteSpace(port))
 }
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+// Support Render Postgres env vars (DATABASE_URL / DATABASE_INTERNAL_URL)
+var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL") ?? Environment.GetEnvironmentVariable("DATABASE_INTERNAL_URL");
+if (string.IsNullOrWhiteSpace(connectionString) && !string.IsNullOrWhiteSpace(databaseUrl))
+{
+    connectionString = databaseUrl;
+}
+
+if (!string.IsNullOrWhiteSpace(connectionString) &&
+    (connectionString.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase) ||
+     connectionString.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase)))
+{
+    var uri = new Uri(connectionString);
+    var userInfo = uri.UserInfo.Split(':', 2);
+    var npgsqlBuilder = new NpgsqlConnectionStringBuilder
+    {
+        Host = uri.Host,
+        Port = uri.IsDefaultPort ? 5432 : uri.Port,
+        Username = Uri.UnescapeDataString(userInfo[0]),
+        Password = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : string.Empty,
+        Database = uri.AbsolutePath.Trim('/'),
+        SslMode = SslMode.Require,
+        TrustServerCertificate = true
+    };
+    connectionString = npgsqlBuilder.ConnectionString;
+}
+
+if (string.IsNullOrWhiteSpace(databaseProvider) &&
+    !string.IsNullOrWhiteSpace(connectionString) &&
+    connectionString.Contains("Host=", StringComparison.OrdinalIgnoreCase))
+{
+    databaseProvider = "Postgres";
+}
+
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException("Connection string 'DefaultConnection' not found. Set ConnectionStrings__DefaultConnection or DATABASE_URL.");
+}
 if (string.Equals(builder.Environment.EnvironmentName, "IntegrationTesting", StringComparison.OrdinalIgnoreCase))
 {
     // Use shared in-memory SQLite for integration tests
