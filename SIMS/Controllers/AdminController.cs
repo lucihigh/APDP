@@ -6,6 +6,7 @@ using SIMS.Data;
 using SIMS.Models;
 using SIMS.Services;
 using System.Text;
+using System.Globalization;
 
 namespace SIMS.Controllers;
 
@@ -128,25 +129,62 @@ public class AdminController : Controller
 
         using var reader = new StreamReader(file.OpenReadStream());
         int created = 0, updated = 0;
-        string? line;
-        bool header = true;
 
+        var headerLine = await reader.ReadLineAsync();
+        if (string.IsNullOrWhiteSpace(headerLine))
+        {
+            ModelState.AddModelError(string.Empty, "CSV file is empty");
+            return View();
+        }
+
+        var headerMap = BuildHeaderIndex(headerLine);
+        if (!headerMap.ContainsKey("email"))
+        {
+            ModelState.AddModelError(string.Empty, "CSV must include an Email column");
+            return View();
+        }
+
+        string? line;
         while ((line = await reader.ReadLineAsync()) != null)
         {
-            if (header)
+            if (string.IsNullOrWhiteSpace(line)) continue;
+
+            var cols = ParseCsvLine(line);
+            string Get(string key) => TryGetColumn(cols, headerMap, key);
+
+            var email = Get("email");
+            if (string.IsNullOrWhiteSpace(email) || !email.Contains('@')) continue;
+
+            var first = Get("firstname");
+            var last = Get("lastname");
+            var program = Get("program");
+            var phone = Get("phone");
+            var address = Get("address");
+
+            int? year = null;
+            if (int.TryParse(Get("year"), out var parsedYear))
             {
-                header = false;
-                continue;
+                year = parsedYear;
             }
 
-            var cols = line.Split(',');
-            if (cols.Length < 5) continue;
+            double? gpa = null;
+            var gpaText = Get("gpa").Replace(',', '.');
+            if (double.TryParse(gpaText, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedGpa))
+            {
+                gpa = parsedGpa;
+            }
 
-            var email = cols[0].Trim();
-            var first = cols[1].Trim();
-            var last = cols[2].Trim();
-            var program = cols[3].Trim();
-            _ = int.TryParse(cols[4].Trim(), out var year);
+            DateOnly? dob = null;
+            var dobText = Get("dateofbirth");
+            if (string.IsNullOrWhiteSpace(dobText))
+            {
+                dobText = Get("dob");
+            }
+            if (!string.IsNullOrWhiteSpace(dobText) &&
+                DateTime.TryParse(dobText, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedDob))
+            {
+                dob = DateOnly.FromDateTime(parsedDob);
+            }
 
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
@@ -181,8 +219,12 @@ public class AdminController : Controller
             student.Program = program;
             student.Year = year;
             student.Email = email;
+            student.Phone = phone;
+            student.Address = address;
+            student.GPA = gpa;
+            student.DateOfBirth = dob;
 
-            _db.Update(student);
+            _db.Students.Update(student);
         }
 
         await _db.SaveChangesAsync();
@@ -202,6 +244,74 @@ public class AdminController : Controller
         }
 
         return File(Encoding.UTF8.GetBytes(sw.ToString()), "text/csv", "students.csv");
+    }
+
+    private static Dictionary<string, int> BuildHeaderIndex(string headerLine)
+    {
+        var headers = ParseCsvLine(headerLine);
+        var map = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        for (int i = 0; i < headers.Count; i++)
+        {
+            var key = NormalizeHeader(headers[i]);
+            if (!string.IsNullOrWhiteSpace(key) && !map.ContainsKey(key))
+            {
+                map[key] = i;
+            }
+        }
+
+        return map;
+    }
+
+    private static string NormalizeHeader(string header)
+    {
+        return header.Trim().Replace(" ", string.Empty).Replace("_", string.Empty).ToLowerInvariant();
+    }
+
+    private static string TryGetColumn(IReadOnlyList<string> cols, Dictionary<string, int> headerMap, string key)
+    {
+        if (headerMap.TryGetValue(NormalizeHeader(key), out var idx) && idx >= 0 && idx < cols.Count)
+        {
+            return cols[idx].Trim();
+        }
+
+        return string.Empty;
+    }
+
+    // Minimal CSV parser that supports quoted values and commas inside quotes
+    private static List<string> ParseCsvLine(string line)
+    {
+        var result = new List<string>();
+        var current = new StringBuilder();
+        var inQuotes = false;
+
+        for (int i = 0; i < line.Length; i++)
+        {
+            var c = line[i];
+            if (c == '"')
+            {
+                if (inQuotes && i + 1 < line.Length && line[i + 1] == '"')
+                {
+                    current.Append('"');
+                    i++; // skip escaped quote
+                }
+                else
+                {
+                    inQuotes = !inQuotes;
+                }
+            }
+            else if (c == ',' && !inQuotes)
+            {
+                result.Add(current.ToString());
+                current.Clear();
+            }
+            else
+            {
+                current.Append(c);
+            }
+        }
+
+        result.Add(current.ToString());
+        return result;
     }
 }
 

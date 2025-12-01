@@ -9,7 +9,9 @@
                 <form method="post" enctype="multipart/form-data" class="row g-3">
                     <div class="col-12">
                         <input type="file" name="file" class="form-control" accept=".csv" required />
-                        <div class="form-text">Format: Email,FirstName,LastName,Program,Year (first row header is ignored)</div>
+                        <div class="form-text">
+                            CSV with headers (case-insensitive). Supported columns: Email (required), FirstName, LastName, DateOfBirth/DOB, Phone, Address, Program, Year, GPA.
+                        </div>
                     </div>
                     <div class="col-12 d-flex gap-2">
                         <button type="submit" class="btn btn-primary">Import</button>
