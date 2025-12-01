@@ -1,7 +1,7 @@
 @model SIMS.Models.Course
-
 @{
     ViewData["Title"] = "Course details";
+    var isAdmin = User?.IsInRole("Admin") ?? false;
 }
 
 <div class="page-header mb-3">
@@ -34,7 +34,7 @@
         </dl>
 
         <div class="d-flex gap-2 mt-4">
-            @if (User.IsInRole("Admin"))
+            @if (isAdmin)
             {
                 <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">
                     <i class="bi bi-pencil me-1"></i>Edit

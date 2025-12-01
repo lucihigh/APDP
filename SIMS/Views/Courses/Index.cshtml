@@ -4,12 +4,16 @@
     ViewData["Title"] = "Courses";
 }
 
+@{
+    var isAdmin = User?.IsInRole("Admin") ?? false;
+}
+
 <div class="page-header d-flex flex-wrap align-items-center justify-content-between gap-2">
     <div>
         <div class="page-header-title">Courses</div>
-        <div class="page-header-subtitle">Browse and manage all available courses.</div>
+        <div class="page-header-subtitle">@(isAdmin ? "Browse and manage all available courses." : "Browse available courses and view class lists.")</div>
     </div>
-    @if (User.IsInRole("Admin"))
+    @if (isAdmin)
     {
         <div class="d-flex gap-2">
             <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-lg me-1"></i> New course</a>
@@ -68,7 +72,7 @@
                     <a class="btn btn-sm btn-outline-secondary" asp-action="ClassList" asp-route-id="@item.Id">
                         <i class="bi bi-people-fill me-1"></i>Class list
                     </a>
-                    @if (User.IsInRole("Admin"))
+                    @if (isAdmin)
                     {
                         <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@item.Id">
                             <i class="bi bi-trash me-1"></i>Delete
