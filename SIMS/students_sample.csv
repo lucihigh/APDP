@@ -1,0 +1,101 @@
+Email,FirstName,LastName,DateOfBirth,Phone,Address,Program,Year,GPA
+huy.ngo1@example.com,Huy,Ngo,2000-04-13,0985644703,Can Tho,SE,1,3.74
+hanh.pham2@example.com,Hanh,Pham,2001-10-02,0961344291,Quang Ninh,BA,3,3.26
+huy.do3@example.com,Huy,Do,2003-12-01,0921702192,Da Nang,FIN,4,3.34
+duy.vo4@example.com,Duy,Vo,2000-06-03,0922351829,Da Nang,FIN,4,2.93
+yen.ngo5@example.com,Yen,Ngo,2005-02-11,0960172374,Can Tho,SE,3,3.7
+thanh.ho6@example.com,Thanh,Ho,2005-08-11,0947073766,Hue,FIN,2,2.38
+an.nguyen7@example.com,An,Nguyen,2006-05-06,0947013934,Quang Ninh,DS,4,3.37
+lan.do8@example.com,Lan,Do,2006-02-04,0968842015,Hai Phong,FIN,3,3.34
+tam.bui9@example.com,Tam,Bui,2005-08-10,0926025077,Quang Ninh,IT,2,3.54
+trung.nguyen10@example.com,Trung,Nguyen,2004-11-01,0987191260,Can Tho,CS,4,2.87
+thuy.nguyen11@example.com,Thuy,Nguyen,2001-05-06,0958427389,Can Tho,BA,3,3.47
+nghia.nguyen12@example.com,Nghia,Nguyen,2005-05-06,0999292448,Da Nang,BA,2,2.27
+toan.ho13@example.com,Toan,Ho,2004-04-22,0932515372,Quang Ninh,FIN,3,3.09
+thanh.tran14@example.com,Thanh,Tran,2005-05-02,0992895341,Thanh Hoa,DS,2,3.86
+phuc.vo15@example.com,Phuc,Vo,2005-08-07,0935786542,Ho Chi Minh,BA,4,3.89
+hung.nguyen16@example.com,Hung,Nguyen,1999-12-17,0977794544,Ho Chi Minh,ENG,2,2.51
+trang.nguyen17@example.com,Trang,Nguyen,2005-02-18,0974297414,Hue,SE,2,3.2
+thu.vu18@example.com,Thu,Vu,2004-07-18,0956844125,Thanh Hoa,MK,1,2.22
+hanh.ho19@example.com,Hanh,Ho,2004-01-13,0954614431,Ho Chi Minh,CS,2,2.58
+dung.nguyen20@example.com,Dung,Nguyen,2003-10-18,0930957019,Ha Noi,FIN,4,2.07
+ngoc.dang21@example.com,Ngoc,Dang,2006-03-13,0977436199,Thanh Hoa,SE,2,3.6
+van.vu22@example.com,Van,Vu,2006-05-08,0948644649,Quang Ninh,DS,1,2.21
+hanh.ho23@example.com,Hanh,Ho,2005-05-21,0975678979,Hue,IT,1,2.96
+tam.vo24@example.com,Tam,Vo,2003-03-10,0973860610,Hue,BA,3,3.64
+hung.le25@example.com,Hung,Le,2005-12-21,0910129953,Thanh Hoa,MK,2,2.97
+phuc.vo26@example.com,Phuc,Vo,2005-09-21,0944789301,Can Tho,SE,3,3.52
+nghia.dang27@example.com,Nghia,Dang,2004-01-07,0957803965,Thanh Hoa,ENG,2,3.76
+an.ly28@example.com,An,Ly,2004-03-08,0933194730,Ho Chi Minh,IT,2,3.26
+tuan.dang29@example.com,Tuan,Dang,2001-01-23,0942604878,Quang Ninh,CS,1,2.63
+an.le30@example.com,An,Le,2004-12-10,0949183902,Quang Ninh,SE,3,3.65
+tien.ngo31@example.com,Tien,Ngo,2000-12-14,0965809891,Hai Phong,CS,4,3.28
+giang.ly32@example.com,Giang,Ly,2003-12-17,0970447416,Can Tho,DS,1,2.41
+thu.duong33@example.com,Thu,Duong,2004-03-14,0945562413,Can Tho,MK,2,3.9
+chi.vu34@example.com,Chi,Vu,2003-06-01,0993305213,Da Nang,MK,1,2.54
+phuc.nguyen35@example.com,Phuc,Nguyen,2004-07-15,0954136609,Ha Noi,BA,2,3.08
+phuc.duong36@example.com,Phuc,Duong,2000-10-05,0990527970,Hue,IT,3,3.69
+quang.duong37@example.com,Quang,Duong,2002-12-11,0959499435,Ha Noi,MK,1,2.48
+thao.pham38@example.com,Thao,Pham,2003-05-07,0968740435,Hue,DS,3,2.52
+trung.hoang39@example.com,Trung,Hoang,2004-03-19,0947092291,Da Nang,MK,4,2.97
+nga.duong40@example.com,Nga,Duong,2001-12-09,0959353709,Ha Noi,IT,1,3.8
+binh.nguyen41@example.com,Binh,Nguyen,2003-04-12,0915474241,Ho Chi Minh,DS,4,2.63
+thang.bui42@example.com,Thang,Bui,2003-12-08,0934649123,Da Nang,ENG,2,3.16
+giang.ho43@example.com,Giang,Ho,2000-09-10,0983349582,Quang Ninh,ENG,4,2.87
+minh.le44@example.com,Minh,Le,2004-07-26,0965366376,Ho Chi Minh,DS,4,2.76
+quyen.phan45@example.com,Quyen,Phan,2003-03-04,0941405740,Thanh Hoa,SE,1,3.2
+hanh.do46@example.com,Hanh,Do,1999-03-06,0937464930,Can Tho,BA,3,2.48
+hoa.phan47@example.com,Hoa,Phan,2006-08-27,0958975907,Thanh Hoa,CS,4,3.34
+linh.ngo48@example.com,Linh,Ngo,2006-05-11,0990253867,Quang Ninh,FIN,1,3.05
+yen.ngo49@example.com,Yen,Ngo,2005-10-19,0921864644,Ho Chi Minh,FIN,4,2.93
+vy.vo50@example.com,Vy,Vo,2000-03-24,0984276900,Quang Ninh,DS,2,3.59
+phuong.vo51@example.com,Phuong,Vo,2002-01-11,0921287855,Can Tho,FIN,4,2.49
+binh.ly52@example.com,Binh,Ly,1999-01-10,0927863102,Quang Ninh,CS,4,2.32
+khue.bui53@example.com,Khue,Bui,2004-10-26,0995147619,Quang Ninh,SE,2,2.56
+nghia.bui54@example.com,Nghia,Bui,2002-09-01,0993859584,Ho Chi Minh,DS,1,3.22
+thao.ly55@example.com,Thao,Ly,2002-12-26,0945305898,Hue,MK,3,2.81
+thuy.vo56@example.com,Thuy,Vo,2006-05-23,0931367501,Ha Noi,SE,3,3.0
+trang.ho57@example.com,Trang,Ho,2002-01-21,0917948024,Quang Ninh,MK,3,2.27
+chi.vo58@example.com,Chi,Vo,2004-01-24,0932891841,Quang Ninh,IT,1,3.31
+khue.bui59@example.com,Khue,Bui,2006-08-07,0981682848,Quang Ninh,ENG,1,2.65
+vy.pham60@example.com,Vy,Pham,2002-08-01,0929716093,Hue,ENG,1,2.72
+mai.vo61@example.com,Mai,Vo,2004-07-21,0983158709,Da Nang,SE,4,3.81
+tung.vu62@example.com,Tung,Vu,2006-03-26,0956239989,Hai Phong,ENG,3,2.1
+hanh.tran63@example.com,Hanh,Tran,1999-03-15,0915658766,Hai Phong,FIN,1,2.25
+tien.duong64@example.com,Tien,Duong,1999-12-26,0997849005,Ho Chi Minh,ENG,3,2.31
+tam.le65@example.com,Tam,Le,2005-10-04,0965498733,Ho Chi Minh,DS,1,3.47
+khanh.dang66@example.com,Khanh,Dang,1999-09-25,0981833118,Ho Chi Minh,DS,1,2.22
+son.do67@example.com,Son,Do,2003-03-07,0990728352,Hue,CS,4,3.05
+dung.pham68@example.com,Dung,Pham,2006-01-15,0975858426,Quang Ninh,ENG,3,2.68
+dung.vu69@example.com,Dung,Vu,2004-06-24,0983692168,Quang Ninh,ENG,4,3.65
+hoa.hoang70@example.com,Hoa,Hoang,2006-08-19,0949077937,Thanh Hoa,MK,3,2.07
+tan.le71@example.com,Tan,Le,2004-12-25,0940743163,Can Tho,BA,4,2.51
+chi.hoang72@example.com,Chi,Hoang,2000-03-02,0944644653,Ha Noi,DS,1,2.7
+huy.bui73@example.com,Huy,Bui,2001-03-25,0914934226,Quang Ninh,MK,3,2.68
+quang.vo74@example.com,Quang,Vo,1999-03-27,0913881469,Ho Chi Minh,CS,4,2.46
+van.pham75@example.com,Van,Pham,2000-08-15,0995791460,Ha Noi,FIN,1,3.56
+long.nguyen76@example.com,Long,Nguyen,2002-03-28,0921673907,Can Tho,IT,1,2.69
+van.vo77@example.com,Van,Vo,2005-10-04,0974372172,Hue,ENG,3,2.85
+quyen.ngo78@example.com,Quyen,Ngo,2005-02-20,0917480960,Ha Noi,CS,4,2.65
+thao.pham79@example.com,Thao,Pham,2003-02-10,0994027092,Hue,FIN,3,2.05
+phuong.dang80@example.com,Phuong,Dang,2002-10-05,0926795022,Da Nang,SE,4,3.88
+tien.ngo81@example.com,Tien,Ngo,2006-07-20,0913721659,Ho Chi Minh,MK,1,3.01
+lam.ho82@example.com,Lam,Ho,2000-03-26,0923562093,Da Nang,SE,3,2.35
+mai.ngo83@example.com,Mai,Ngo,2004-09-14,0925946937,Hai Phong,IT,4,2.16
+khue.vo84@example.com,Khue,Vo,2006-12-16,0914324994,Ho Chi Minh,DS,1,3.22
+hanh.le85@example.com,Hanh,Le,2000-01-07,0953684461,Hue,ENG,4,3.03
+minh.ho86@example.com,Minh,Ho,2003-03-25,0910032404,Hai Phong,FIN,1,3.55
+vy.duong87@example.com,Vy,Duong,1999-10-06,0997942685,Hue,ENG,2,3.5
+son.ngo88@example.com,Son,Ngo,1999-09-15,0955105601,Hai Phong,BA,2,3.15
+tan.vo89@example.com,Tan,Vo,2004-08-16,0932972737,Ha Noi,MK,2,3.91
+hung.do90@example.com,Hung,Do,2002-04-28,0958501121,Ha Noi,DS,2,2.22
+lan.tran91@example.com,Lan,Tran,2005-06-10,0915114706,Can Tho,BA,2,2.6
+trinh.dang92@example.com,Trinh,Dang,2003-05-25,0944055120,Quang Ninh,IT,1,2.57
+tien.hoang93@example.com,Tien,Hoang,1999-12-07,0955735483,Ho Chi Minh,BA,2,2.25
+lam.le94@example.com,Lam,Le,2004-08-01,0988152122,Hue,BA,4,2.24
+khue.tran95@example.com,Khue,Tran,1999-10-23,0995701033,Hue,MK,3,3.86
+tien.tran96@example.com,Tien,Tran,2001-06-10,0926358355,Ho Chi Minh,DS,4,3.56
+hung.dang97@example.com,Hung,Dang,2004-07-16,0945795623,Ha Noi,CS,1,3.91
+vy.do98@example.com,Vy,Do,2006-11-28,0955959885,Ho Chi Minh,SE,3,3.83
+nga.bui99@example.com,Nga,Bui,2005-10-13,0922406716,Hue,CS,4,3.96
+mai.pham100@example.com,Mai,Pham,2002-08-28,0929016100,Can Tho,ENG,1,2.79
