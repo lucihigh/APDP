@@ -1,0 +1,28 @@
+@{
+    ViewData["Title"] = "Reports";
+}
+<h1>Reports</h1>
+<p class="text-muted">Generate course roster and gradebook reports (CSV).</p>
+<form method="get" asp-action="CourseRosterCsv" class="row g-2 mb-3">
+    <div class="col-auto">
+        <label class="form-label">Course Id</label>
+        <input class="form-control" name="courseId" required />
+    </div>
+    <div class="col-auto align-self-end">
+        <button class="btn btn-outline-primary" type="submit">Course Roster CSV</button>
+    </div>
+</form>
+<form method="get" asp-action="GradebookCsv" class="row g-2 mb-3">
+    <div class="col-auto">
+        <label class="form-label">Course Id</label>
+        <input class="form-control" name="courseId" required />
+    </div>
+    <div class="col-auto align-self-end">
+        <button class="btn btn-outline-primary" type="submit">Gradebook CSV</button>
+    </div>
+</form>
+@if (User.IsInRole("Admin"))
+{
+    <a class="btn btn-outline-secondary" asp-action="SystemSummaryCsv">System Summary CSV</a>
+}
+

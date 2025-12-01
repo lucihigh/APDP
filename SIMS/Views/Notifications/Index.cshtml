@@ -1,0 +1,26 @@
+@model IEnumerable<SIMS.Models.Notification>
+@{
+    ViewData["Title"] = "Notifications";
+}
+<h1 class="mb-3">Notifications</h1>
+<div class="list-group">
+@foreach (var n in Model)
+{
+    <div class="list-group-item d-flex justify-content-between align-items-center @(n.IsRead ? "" : "list-group-item-warning")">
+        <div>
+            <div class="fw-semibold">@n.Message</div>
+            <div class="text-muted small">@n.CreatedAt.ToLocalTime()</div>
+            @if (!string.IsNullOrEmpty(n.Link)) {
+                <a class="small" href="@n.Link">Open</a>
+            }
+        </div>
+        @if (!n.IsRead) {
+            <form asp-action="MarkRead" method="post" class="m-0">
+                <input type="hidden" name="id" value="@n.Id" />
+                <button class="btn btn-sm btn-outline-secondary" type="submit">Mark as read</button>
+            </form>
+        }
+    </div>
+}
+</div>
+

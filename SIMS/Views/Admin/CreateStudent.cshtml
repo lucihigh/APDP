@@ -1,0 +1,66 @@
+@model SIMS.Controllers.CreateStudentInput
+@{
+    ViewData["Title"] = "Create Student";
+}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-transparent fw-semibold">
+                <i class="bi bi-person-plus-fill me-2"></i>Create Student Account
+            </div>
+            <div class="card-body">
+                <form method="post" class="row g-3">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Email</label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Password (optional)</label>
+                        <input asp-for="Password" class="form-control" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">First name</label>
+                        <input asp-for="FirstName" class="form-control" />
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Last name</label>
+                        <input asp-for="LastName" class="form-control" />
+                        <span asp-validation-for="LastName" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Date of birth</label>
+                        <input asp-for="DateOfBirth" class="form-control" />
+                        <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Program</label>
+                        <input asp-for="Program" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Year</label>
+                        <input asp-for="Year" class="form-control" />
+                    </div>
+
+                    <div class="col-12 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Create</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+                    </div>
+
+                    <div class="form-text">
+                        Neu de trong mat khau, he thong se tu tao theo dang:
+                        <code>Ten + chu cai dau ho va ten dem + &#64; + nam sinh</code>.
+                        Vi du: <strong>Le Danh Dat</strong> sinh nam <strong>2005</strong> thi mat khau se la
+                        <strong>Datld@2005</strong>.
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

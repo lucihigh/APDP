@@ -1,0 +1,70 @@
+@model SIMS.Models.Student
+@{
+    ViewData["Title"] = "Delete student";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <div class="page-header-title mb-1">Delete student</div>
+        <div class="page-header-subtitle">Are you sure you want to remove this student profile?</div>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back to list</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="alert alert-danger d-flex align-items-center" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <div>
+                This action will permanently delete the student record and related enrollments.
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="fw-semibold text-muted small">Full name</div>
+                <div class="fs-5">@Model.FullName</div>
+            </div>
+            <div class="col-md-6">
+                <div class="fw-semibold text-muted small">User ID</div>
+                <div class="font-monospace">@Model.UserId</div>
+            </div>
+            <div class="col-md-6">
+                <div class="fw-semibold text-muted small">Date of birth</div>
+                <div>@(Model.DateOfBirth?.ToString("yyyy-MM-dd") ?? "—")</div>
+            </div>
+            <div class="col-md-6">
+                <div class="fw-semibold text-muted small">Email</div>
+                <div>@Model.Email</div>
+            </div>
+            <div class="col-md-6">
+                <div class="fw-semibold text-muted small">Phone</div>
+                <div>@Model.Phone</div>
+            </div>
+            <div class="col-md-6">
+                <div class="fw-semibold text-muted small">Address</div>
+                <div>@Model.Address</div>
+            </div>
+            <div class="col-md-6">
+                <div class="fw-semibold text-muted small">Program</div>
+                <div>@Model.Program</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fw-semibold text-muted small">Year</div>
+                <div>@Model.Year</div>
+            </div>
+            <div class="col-md-3">
+                <div class="fw-semibold text-muted small">GPA</div>
+                <div>@Model.GPA</div>
+            </div>
+        </div>
+
+        <form asp-action="Delete" class="mt-4">
+            <input type="hidden" asp-for="Id" />
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-danger"><i class="bi bi-trash me-1"></i> Delete</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

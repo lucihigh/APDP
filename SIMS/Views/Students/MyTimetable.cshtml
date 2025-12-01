@@ -1,0 +1,28 @@
+@model IEnumerable<SIMS.Models.ClassSession>
+@{
+    ViewData["Title"] = "My Timetable";
+    string DayName(int d) => System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetDayName((DayOfWeek)d);
+}
+<h1>My Timetable</h1>
+<div class="row g-3">
+@foreach (var group in Model.GroupBy(s => s.DayOfWeek))
+{
+    <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header fw-semibold">@DayName(group.Key)</div>
+            <ul class="list-group list-group-flush">
+            @foreach (var s in group)
+            {
+                <li class="list-group-item d-flex justify-content-between">
+                    <div>
+                        <div class="fw-semibold">@s.Course?.Code - @s.Course?.Name</div>
+                        <div class="text-muted small">@s.Location</div>
+                    </div>
+                    <div class="text-nowrap">@s.StartTime.ToString("yyyy-MM-dd") - @s.EndTime.ToString("yyyy-MM-dd")</div>
+                </li>
+            }
+            </ul>
+        </div>
+    </div>
+}
+</div>
