@@ -38,6 +38,7 @@ body {
   --sims-surface-muted: #020617;
   --sims-border-subtle: #1f2937;
   --sims-navbar-bg: rgba(15, 23, 42, .9);
+  --sims-footer-height: 68px;
 }
 
 body {
@@ -58,6 +59,7 @@ main.flex-grow-1 { display:block; }
   opacity: 1;
   transform: translateY(0);
   transition: opacity .18s ease-out, transform .18s ease-out;
+  padding-bottom: calc(var(--sims-footer-height) + 12px);
 }
 
 .page-shell.page-transition-out {
@@ -472,7 +474,23 @@ table.table > :not(caption) > * > * {
 }
 
 /* Footer */
-.app-footer { color: var(--bs-secondary-color); }
+.app-footer {
+  color: var(--bs-secondary-color);
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  z-index: 1030;
+  background: rgba(2, 6, 23, .94) !important;
+  border-top: 1px solid var(--sims-border-subtle);
+  backdrop-filter: blur(12px);
+}
+
+.app-footer .container-xl {
+  min-height: var(--sims-footer-height);
+}
+
 .app-footer a { text-decoration: none; }
 .app-footer a:hover { text-decoration: underline; }
 
