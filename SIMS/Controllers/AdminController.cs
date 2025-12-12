@@ -341,8 +341,9 @@ public class AdminController : Controller
         {
             sw.WriteLine($"{s.Email},{s.FirstName},{s.LastName},{s.Program},{s.Year},{s.GPA}");
         }
-
-        return File(Encoding.UTF8.GetBytes(sw.ToString()), "text/csv", "students.csv");
+        var utf8Bom = Encoding.UTF8.GetPreamble();
+        var data = utf8Bom.Concat(Encoding.UTF8.GetBytes(sw.ToString())).ToArray();
+        return File(data, "text/csv; charset=utf-8", "students.csv");
     }
 
     private static Dictionary<string, int> BuildHeaderIndex(string headerLine)

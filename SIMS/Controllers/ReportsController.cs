@@ -42,7 +42,8 @@ public class ReportsController : Controller
         sw.WriteLine($"Course,{course?.Code},{course?.Name}");
         sw.WriteLine("Email,FirstName,LastName,Program,Year");
         foreach (var s in rows) sw.WriteLine($"{s.Email},{s.FirstName},{s.LastName},{s.Program},{s.Year}");
-        return File(System.Text.Encoding.UTF8.GetBytes(sw.ToString()), "text/csv", $"roster_{course?.Code}.csv");
+        var data = System.Text.Encoding.UTF8.GetPreamble().Concat(System.Text.Encoding.UTF8.GetBytes(sw.ToString())).ToArray();
+        return File(data, "text/csv; charset=utf-8", $"roster_{course?.Code}.csv");
     }
 
     public async Task<FileResult> GradebookCsv(int courseId)
@@ -65,7 +66,8 @@ public class ReportsController : Controller
         sw.WriteLine($"Course,{course?.Code},{course?.Name}");
         sw.WriteLine("Email,Name,Semester,Grade");
         foreach (var e in rows) sw.WriteLine($"{e.Student?.Email},{e.Student?.FirstName} {e.Student?.LastName},{e.Semester},{e.Grade}");
-        return File(System.Text.Encoding.UTF8.GetBytes(sw.ToString()), "text/csv", $"gradebook_{course?.Code}.csv");
+        var data = System.Text.Encoding.UTF8.GetPreamble().Concat(System.Text.Encoding.UTF8.GetBytes(sw.ToString())).ToArray();
+        return File(data, "text/csv; charset=utf-8", $"gradebook_{course?.Code}.csv");
     }
 
     [Authorize(Roles = "Admin")]
@@ -79,6 +81,7 @@ public class ReportsController : Controller
         sw.WriteLine($"Students,{students}");
         sw.WriteLine($"Courses,{courses}");
         sw.WriteLine($"Enrollments,{enrollments}");
-        return File(System.Text.Encoding.UTF8.GetBytes(sw.ToString()), "text/csv", "summary.csv");
+        var data = System.Text.Encoding.UTF8.GetPreamble().Concat(System.Text.Encoding.UTF8.GetBytes(sw.ToString())).ToArray();
+        return File(data, "text/csv; charset=utf-8", "summary.csv");
     }
 }
