@@ -57,10 +57,20 @@ namespace SIMS.Controllers
             ViewBag.CourseCode = courseCode;
             ViewBag.Semester = semester;
             ViewBag.Student = student;
-            ViewBag.CourseOptions = await _context.Courses
+            var courseOptions = await _context.Courses
                 .OrderBy(c => c.Code)
                 .Select(c => new SelectListItem { Value = c.Code, Text = $"{c.Code} - {c.Name}" })
                 .ToListAsync();
+            if (!courseOptions.Any())
+            {
+                courseOptions = await _context.Enrollments
+                    .Select(e => e.Course!.Code)
+                    .Distinct()
+                    .OrderBy(c => c)
+                    .Select(c => new SelectListItem { Value = c, Text = c })
+                    .ToListAsync();
+            }
+            ViewBag.CourseOptions = courseOptions;
 
             return View(await query.ToListAsync());
         }

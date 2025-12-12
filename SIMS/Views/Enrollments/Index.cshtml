@@ -17,33 +17,38 @@
         }
     </div>
 </div>
-<form method="get" class="row g-2 align-items-end mb-3">
-    <div class="col-md-4 col-lg-3">
-        <label class="form-label">Course</label>
-        <select class="form-select" name="courseCode">
-            <option value="">All courses</option>
-            @if (ViewBag.CourseOptions != null)
-            {
-                foreach (var c in ViewBag.CourseOptions)
-                {
-                    <option value="@c.Value" selected="@(c.Value == (string)ViewBag.CourseCode ? "selected" : null)">@c.Text</option>
-                }
-            }
-        </select>
+<div class="card mb-3 shadow-sm">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-4 col-lg-3">
+                <label class="form-label">Course</label>
+                <select class="form-select" name="courseCode">
+                    <option value="">All courses</option>
+                    @if (ViewBag.CourseOptions != null)
+                    {
+                        foreach (var c in ViewBag.CourseOptions)
+                        {
+                            var selected = string.Equals(c.Value as string, (string)ViewBag.CourseCode as string, StringComparison.OrdinalIgnoreCase) ? "selected" : null;
+                            <option value="@c.Value" selected="@selected">@c.Text</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label class="form-label">Semester</label>
+                <input class="form-control" name="semester" value="@(ViewBag.Semester ?? string.Empty)" placeholder="e.g. Fall 2025" />
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label class="form-label">Student (name/email)</label>
+                <input class="form-control" name="student" value="@(ViewBag.Student ?? string.Empty)" placeholder="Search student" />
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-outline-primary" type="submit"><i class="bi bi-funnel me-1"></i>Filter</button>
+                <a class="btn btn-outline-secondary ms-1" asp-action="Index">Reset</a>
+            </div>
+        </form>
     </div>
-    <div class="col-md-4 col-lg-3">
-        <label class="form-label">Semester</label>
-        <input class="form-control" name="semester" value="@(ViewBag.Semester ?? string.Empty)" placeholder="e.g. Fall 2025" />
-    </div>
-    <div class="col-md-4 col-lg-3">
-        <label class="form-label">Student (name/email)</label>
-        <input class="form-control" name="student" value="@(ViewBag.Student ?? string.Empty)" placeholder="Search student" />
-    </div>
-    <div class="col-auto">
-        <button class="btn btn-outline-primary" type="submit"><i class="bi bi-funnel me-1"></i>Filter</button>
-        <a class="btn btn-outline-secondary ms-1" asp-action="Index">Reset</a>
-    </div>
-</form>
+</div>
 <div class="card shadow-sm">
     <div class="card-body p-0">
 <div class="table-responsive">

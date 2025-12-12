@@ -344,21 +344,25 @@ namespace SIMS.Controllers
             {
                 parsedDob = null;
             }
-            if (!ModelState.IsValid)
+
+            // Update student with incoming values before validation
+            student.FirstName = input.FirstName;
+            student.LastName = input.LastName;
+            student.DateOfBirth = parsedDob;
+            student.Phone = input.Phone;
+            student.Address = input.Address;
+
+            ModelState.Clear();
+            if (!TryValidateModel(student))
             {
                 TempData["Error"] = "Please fix the highlighted fields.";
-                // Preserve immutable fields for display
                 input.Program = student.Program;
                 input.Year = student.Year;
                 input.DateOfBirth = parsedDob;
                 input.Email = student.Email;
                 return View(input);
             }
-            student.FirstName = input.FirstName;
-            student.LastName = input.LastName;
-            student.DateOfBirth = parsedDob;
-            student.Phone = input.Phone;
-            student.Address = input.Address;
+
             await _context.SaveChangesAsync();
             TempData["Success"] = "Profile updated successfully.";
             return RedirectToAction(nameof(MyProfile));
