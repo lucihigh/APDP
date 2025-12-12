@@ -16,6 +16,9 @@ namespace SIMS.Migrations
                 type: "INTEGER",
                 nullable: false,
                 defaultValue: 1);
+
+            // Backfill in case some providers keep default as 0 for existing rows
+            migrationBuilder.Sql("UPDATE \"ClassSessions\" SET \"SessionSlot\" = 1 WHERE \"SessionSlot\" = 0;");
         }
 
         /// <inheritdoc />

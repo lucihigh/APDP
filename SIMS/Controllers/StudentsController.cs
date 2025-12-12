@@ -441,7 +441,7 @@ namespace SIMS.Controllers
                         Sessions = ordered.Select(s => new StudentTimetableSessionViewModel
                         {
                             DayOfWeek = s.DayOfWeek,
-                            SessionSlot = s.SessionSlot,
+                            SessionSlot = s.SessionSlot is >= 1 and <= 6 ? s.SessionSlot : 1,
                             StartDate = s.StartTime,
                             EndDate = s.EndTime,
                             Location = s.Location

@@ -70,6 +70,14 @@ namespace SIMS.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,CourseId,DayOfWeek,SessionSlot,StartTime,EndTime,Location")] ClassSession classSession)
         {
+            // Backward compatibility: if an older UI didn't post SessionSlot, default to slot 1.
+            if (classSession.SessionSlot < 1 || classSession.SessionSlot > 6)
+            {
+                classSession.SessionSlot = 1;
+                ModelState.Remove(nameof(ClassSession.SessionSlot));
+                TryValidateModel(classSession);
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(classSession);
@@ -111,6 +119,14 @@ namespace SIMS.Controllers
             if (id != classSession.Id)
             {
                 return NotFound();
+            }
+
+            // Backward compatibility: if an older UI didn't post SessionSlot, default to slot 1.
+            if (classSession.SessionSlot < 1 || classSession.SessionSlot > 6)
+            {
+                classSession.SessionSlot = 1;
+                ModelState.Remove(nameof(ClassSession.SessionSlot));
+                TryValidateModel(classSession);
             }
 
             if (ModelState.IsValid)

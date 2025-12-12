@@ -49,7 +49,8 @@
 
     try {
       const response = await fetch(url, {
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        cache: 'no-store'
       });
       if (!response.ok) {
         throw new Error('Navigation failed');
