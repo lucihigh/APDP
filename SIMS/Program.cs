@@ -56,6 +56,7 @@ if (string.IsNullOrWhiteSpace(connectionString))
     databaseProvider = "Sqlite";
     Console.WriteLine("Warning: No connection string found. Falling back to SQLite (app.db). Configure ConnectionStrings__DefaultConnection or DATABASE_URL for production.");
 }
+var usingSqliteFallback = string.Equals(databaseProvider, "Sqlite", StringComparison.OrdinalIgnoreCase) && connectionString.Contains("app.db", StringComparison.OrdinalIgnoreCase);
 if (string.Equals(builder.Environment.EnvironmentName, "IntegrationTesting", StringComparison.OrdinalIgnoreCase))
 {
     // Use shared in-memory SQLite for integration tests
@@ -140,46 +141,53 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 // Seed roles and an admin user
-if (!string.Equals(app.Environment.EnvironmentName, "IntegrationTesting", StringComparison.OrdinalIgnoreCase))
+using (var scope = app.Services.CreateScope())
 {
-    using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
     var db = services.GetRequiredService<ApplicationDbContext>();
-    await db.Database.MigrateAsync();
-    await SIMS.Data.SeedData.InitializeAsync(services);
-}
-else
-{
-    using var scope = app.Services.CreateScope();
-    var services = scope.ServiceProvider;
-    var db = services.GetRequiredService<ApplicationDbContext>();
-    db.Database.EnsureCreated();
 
-    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-    var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
-    foreach (var role in new[] { "Admin", "Faculty", "Student" })
+    if (string.Equals(app.Environment.EnvironmentName, "IntegrationTesting", StringComparison.OrdinalIgnoreCase) || usingSqliteFallback)
     {
-        if (!await roleManager.RoleExistsAsync(role))
+        // For integration tests or fallback SQLite, avoid migration lock loops
+        db.Database.EnsureCreated();
+    }
+    else
+    {
+        await db.Database.MigrateAsync();
+    }
+
+    if (!string.Equals(app.Environment.EnvironmentName, "IntegrationTesting", StringComparison.OrdinalIgnoreCase))
+    {
+        await SIMS.Data.SeedData.InitializeAsync(services);
+    }
+    else
+    {
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+        var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+        foreach (var role in new[] { "Admin", "Faculty", "Student" })
         {
-            await roleManager.CreateAsync(new IdentityRole(role));
+            if (!await roleManager.RoleExistsAsync(role))
+            {
+                await roleManager.CreateAsync(new IdentityRole(role));
+            }
         }
-    }
-    var admin = await userManager.FindByNameAsync("admin");
-    if (admin == null)
-    {
-        admin = new IdentityUser { UserName = "admin", Email = "admin@sims.local", EmailConfirmed = true };
-        await userManager.CreateAsync(admin, "admin123");
-        await userManager.AddToRoleAsync(admin, "Admin");
-    }
+        var admin = await userManager.FindByNameAsync("admin");
+        if (admin == null)
+        {
+            admin = new IdentityUser { UserName = "admin", Email = "admin@sims.local", EmailConfirmed = true };
+            await userManager.CreateAsync(admin, "admin123");
+            await userManager.AddToRoleAsync(admin, "Admin");
+        }
 
-    if (!db.Courses.Any())
-    {
-        db.Courses.AddRange(
-            new SIMS.Models.Course { Code = "CS101", Name = "Intro to Computer Science", Credits = 3, Department = "CS" },
-            new SIMS.Models.Course { Code = "CS201", Name = "Data Structures", Credits = 4, Department = "CS" },
-            new SIMS.Models.Course { Code = "MATH101", Name = "Calculus I", Credits = 4, Department = "Math" }
-        );
-        await db.SaveChangesAsync();
+        if (!db.Courses.Any())
+        {
+            db.Courses.AddRange(
+                new SIMS.Models.Course { Code = "CS101", Name = "Intro to Computer Science", Credits = 3, Department = "CS" },
+                new SIMS.Models.Course { Code = "CS201", Name = "Data Structures", Credits = 4, Department = "CS" },
+                new SIMS.Models.Course { Code = "MATH101", Name = "Calculus I", Credits = 4, Department = "Math" }
+            );
+            await db.SaveChangesAsync();
+        }
     }
 }
 
