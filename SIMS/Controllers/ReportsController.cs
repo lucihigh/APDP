@@ -84,6 +84,7 @@ public class ReportsController : Controller
     }
 
     [HttpGet]
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public async Task<IActionResult> CourseMetrics(int courseId)
     {
         var course = await _db.Courses.AsNoTracking().FirstOrDefaultAsync(c => c.Id == courseId);
@@ -122,6 +123,18 @@ public class ReportsController : Controller
             .OrderByDescending(x => x.count)
             .ToList();
 
+        var students = enrollments
+            .Select(e => new
+            {
+                name = $"{e.Student!.FirstName} {e.Student.LastName}".Trim(),
+                email = e.Student.Email,
+                program = e.Student.Program,
+                year = e.Student.Year,
+                grade = e.Grade,
+                semester = e.Semester
+            })
+            .ToList();
+
         return Json(new
         {
             course = new { course.Id, course.Code, course.Name },
@@ -130,7 +143,8 @@ public class ReportsController : Controller
             pending,
             averageGrade = average,
             distribution,
-            programs
+            programs,
+            students
         });
     }
 }

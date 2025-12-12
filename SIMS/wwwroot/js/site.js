@@ -291,7 +291,8 @@
       try {
         await ensureChartJs();
         const res = await fetch(`/Reports/CourseMetrics?courseId=${courseId}`, {
-          headers: { 'X-Requested-With': 'XMLHttpRequest' }
+          headers: { 'X-Requested-With': 'XMLHttpRequest' },
+          cache: 'no-store'
         });
         if (!res.ok) throw new Error('Failed to load metrics');
         const data = await res.json();
