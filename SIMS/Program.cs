@@ -131,6 +131,25 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
+// Prevent stale HTML being cached (helps when deploying UI changes to mobile browsers)
+app.Use(async (context, next) =>
+{
+    context.Response.OnStarting(() =>
+    {
+        if (HttpMethods.IsGet(context.Request.Method) &&
+            (context.Response.ContentType?.StartsWith("text/html", StringComparison.OrdinalIgnoreCase) ?? false))
+        {
+            context.Response.Headers.CacheControl = "no-store, no-cache, must-revalidate, max-age=0";
+            context.Response.Headers.Pragma = "no-cache";
+            context.Response.Headers.Expires = "0";
+        }
+
+        return Task.CompletedTask;
+    });
+
+    await next();
+});
+
 app.UseAuthentication();
 app.UseAuthorization();
 
