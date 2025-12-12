@@ -139,10 +139,14 @@ app.MapControllerRoute(
 
 app.MapRazorPages();
 
-// Seed roles and an admin user (skip during IntegrationTesting to avoid provider conflicts)
+// Seed roles and an admin user
 if (!string.Equals(app.Environment.EnvironmentName, "IntegrationTesting", StringComparison.OrdinalIgnoreCase))
 {
-    await SIMS.Data.SeedData.InitializeAsync(app.Services);
+    using var scope = app.Services.CreateScope();
+    var services = scope.ServiceProvider;
+    var db = services.GetRequiredService<ApplicationDbContext>();
+    await db.Database.MigrateAsync();
+    await SIMS.Data.SeedData.InitializeAsync(services);
 }
 else
 {
