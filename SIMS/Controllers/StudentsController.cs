@@ -315,7 +315,7 @@ namespace SIMS.Controllers
         [Authorize(Roles = "Student")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateProfile([Bind("Id,FirstName,LastName,DateOfBirth,Phone,Address,Program,Year")] Student input)
+        public async Task<IActionResult> UpdateProfile([Bind("Id,FirstName,LastName,DateOfBirth,Phone,Address")] Student input)
         {
             var user = await _userManager.GetUserAsync(User);
             var student = await _context.Students.FirstOrDefaultAsync(s => s.Id == input.Id && s.UserId == user!.Id);
@@ -330,8 +330,6 @@ namespace SIMS.Controllers
             student.DateOfBirth = input.DateOfBirth;
             student.Phone = input.Phone;
             student.Address = input.Address;
-            student.Program = input.Program;
-            student.Year = input.Year;
             await _context.SaveChangesAsync();
             TempData["Success"] = "Profile updated successfully.";
             return RedirectToAction(nameof(MyProfile));

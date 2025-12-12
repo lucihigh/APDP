@@ -49,14 +49,12 @@
                         <span asp-validation-for="Address" class="text-danger"></span>
                     </div>
                     <div class="col-md-6">
-                        <label asp-for="Program" class="form-label"></label>
-                        <input asp-for="Program" class="form-control" />
-                        <span asp-validation-for="Program" class="text-danger"></span>
+                        <label class="form-label">Program (read-only)</label>
+                        <input class="form-control" value="@Model.Program" readonly />
                     </div>
                     <div class="col-md-6">
-                        <label asp-for="Year" class="form-label"></label>
-                        <input asp-for="Year" class="form-control" />
-                        <span asp-validation-for="Year" class="text-danger"></span>
+                        <label class="form-label">Year (read-only)</label>
+                        <input class="form-control" value="@(Model.Year?.ToString() ?? string.Empty)" readonly />
                     </div>
                     <div class="col-12 d-flex gap-2 pt-2">
                         <button type="submit" class="btn btn-primary">
