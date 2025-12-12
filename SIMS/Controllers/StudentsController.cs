@@ -310,58 +310,62 @@ namespace SIMS.Controllers
             var user = await _userManager.GetUserAsync(User);
             var student = await _context.Students.FirstOrDefaultAsync(s => s.UserId == user!.Id);
             if (student == null) return RedirectToAction(nameof(Create));
-            return View(student);
+
+            var vm = new StudentProfileUpdateViewModel
+            {
+                Id = student.Id,
+                FirstName = student.FirstName,
+                LastName = student.LastName,
+                DateOfBirth = student.DateOfBirth?.ToString("yyyy-MM-dd"),
+                Phone = student.Phone,
+                Address = student.Address,
+                Program = student.Program,
+                Year = student.Year,
+                Email = student.Email
+            };
+            return View(vm);
         }
 
         [Authorize(Roles = "Student")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateProfile([Bind("Id,FirstName,LastName,Phone,Address")] Student input)
+        public async Task<IActionResult> UpdateProfile(StudentProfileUpdateViewModel vm)
         {
             var user = await _userManager.GetUserAsync(User);
-            var student = await _context.Students.FirstOrDefaultAsync(s => s.Id == input.Id && s.UserId == user!.Id);
+            var student = await _context.Students.FirstOrDefaultAsync(s => s.Id == vm.Id && s.UserId == user!.Id);
             if (student == null) return NotFound();
-            ModelState.Remove(nameof(Student.Email));
-            ModelState.Remove(nameof(Student.Program));
-            ModelState.Remove(nameof(Student.Year));
-            ModelState.Remove(nameof(Student.DateOfBirth));
 
             DateOnly? parsedDob = student.DateOfBirth;
-            var dobText = Request.Form["DateOfBirth"].ToString();
-            if (!string.IsNullOrWhiteSpace(dobText))
+            if (!string.IsNullOrWhiteSpace(vm.DateOfBirth))
             {
                 var formats = new[] { "yyyy-MM-dd", "dd/MM/yyyy", "MM/dd/yyyy" };
-                if (DateTime.TryParseExact(dobText, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dt))
+                if (DateTime.TryParseExact(vm.DateOfBirth, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dt))
                 {
                     parsedDob = DateOnly.FromDateTime(dt);
                 }
+                else if (DateTime.TryParse(vm.DateOfBirth, out var dt2))
+                {
+                    parsedDob = DateOnly.FromDateTime(dt2);
+                }
                 else
                 {
-                    ModelState.AddModelError(nameof(Student.DateOfBirth), "Invalid date format.");
+                    ModelState.AddModelError(nameof(vm.DateOfBirth), "Invalid date format.");
                 }
             }
-            else
+
+            if (!ModelState.IsValid)
             {
-                parsedDob = null;
+                vm.Program = student.Program;
+                vm.Year = student.Year;
+                vm.Email = student.Email;
+                return View(vm);
             }
 
-            // Update student with incoming values before validation
-            student.FirstName = input.FirstName;
-            student.LastName = input.LastName;
+            student.FirstName = vm.FirstName;
+            student.LastName = vm.LastName;
             student.DateOfBirth = parsedDob;
-            student.Phone = input.Phone;
-            student.Address = input.Address;
-
-            ModelState.Clear();
-            if (!TryValidateModel(student))
-            {
-                TempData["Error"] = "Please fix the highlighted fields.";
-                input.Program = student.Program;
-                input.Year = student.Year;
-                input.DateOfBirth = parsedDob;
-                input.Email = student.Email;
-                return View(input);
-            }
+            student.Phone = vm.Phone;
+            student.Address = vm.Address;
 
             await _context.SaveChangesAsync();
             TempData["Success"] = "Profile updated successfully.";

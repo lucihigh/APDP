@@ -1,4 +1,4 @@
-@model SIMS.Models.Student
+@model SIMS.Models.StudentProfileUpdateViewModel
 @{
     ViewData["Title"] = "Update Profile";
 }
@@ -23,9 +23,6 @@
                 <form asp-action="UpdateProfile" method="post" class="row g-4 mt-4">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <input type="hidden" asp-for="Id" />
-                    <input type="hidden" asp-for="Program" />
-                    <input type="hidden" asp-for="Year" />
-                    <input type="hidden" asp-for="Email" />
                     <div class="col-md-6">
                         <label asp-for="FirstName" class="form-label"></label>
                         <input asp-for="FirstName" class="form-control" />
@@ -38,7 +35,7 @@
                     </div>
                     <div class="col-md-6">
                         <label asp-for="DateOfBirth" class="form-label"></label>
-                        <input asp-for="DateOfBirth" class="form-control" type="date" />
+                        <input asp-for="DateOfBirth" class="form-control" placeholder="yyyy-MM-dd or dd/MM/yyyy" />
                         <span asp-validation-for="DateOfBirth" class="text-danger"></span>
                     </div>
                     <div class="col-md-6">

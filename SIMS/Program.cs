@@ -51,7 +51,10 @@ if (string.IsNullOrWhiteSpace(databaseProvider) &&
 
 if (string.IsNullOrWhiteSpace(connectionString))
 {
-    throw new InvalidOperationException("Connection string 'DefaultConnection' not found. Set ConnectionStrings__DefaultConnection or DATABASE_URL.");
+    // Fallback to local SQLite to avoid deploy crash when env vars are missing (e.g., Render build without DATABASE_URL)
+    connectionString = "Data Source=app.db";
+    databaseProvider = "Sqlite";
+    Console.WriteLine("Warning: No connection string found. Falling back to SQLite (app.db). Configure ConnectionStrings__DefaultConnection or DATABASE_URL for production.");
 }
 if (string.Equals(builder.Environment.EnvironmentName, "IntegrationTesting", StringComparison.OrdinalIgnoreCase))
 {
@@ -75,6 +78,10 @@ else
         if (string.Equals(databaseProvider, "Postgres", StringComparison.OrdinalIgnoreCase))
         {
             options.UseNpgsql(connectionString);
+        }
+        else if (string.Equals(databaseProvider, "Sqlite", StringComparison.OrdinalIgnoreCase))
+        {
+            options.UseSqlite(connectionString);
         }
         else
         {
