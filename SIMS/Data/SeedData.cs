@@ -13,7 +13,10 @@ public static class SeedData
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-        await db.Database.MigrateAsync();
+        var providerName = db.Database.ProviderName ?? string.Empty;
+
+        // Avoid migration/model mismatch when switching providers; just ensure database is created.
+        await db.Database.EnsureCreatedAsync();
 
         // Remove orphaned user-role links to avoid FK violations when roles/users are recreated
         var existingUserIds = new HashSet<string>(await db.Users.Select(u => u.Id).ToListAsync(), StringComparer.OrdinalIgnoreCase);
@@ -148,21 +151,10 @@ public static class SeedData
             await userManager.ResetPasswordAsync(adminUser, token, "admin123");
         }
 
-        // Remove legacy default faculty/student seed accounts if they still exist
-        var legacyEmails = new[] { "faculty@sims.local", "student@sims.local" };
-        foreach (var email in legacyEmails)
-        {
-            var user = await userManager.FindByEmailAsync(email);
-            if (user != null)
-            {
-                var student = await db.Students.FirstOrDefaultAsync(s => s.UserId == user.Id || s.Email == email);
-                if (student != null)
-                {
-                    db.Students.Remove(student);
-                }
-                await userManager.DeleteAsync(user);
-            }
-        }
+        // One default account per role (credentials documented in deployment notes)
+        await EnsureUserInRoleAsync(userManager, "admin2", "admin2@sims.local", "admin123", RoleConstants.AdminName);
+        await EnsureUserInRoleAsync(userManager, "faculty1", "faculty@sims.local", "Faculty#12345", RoleConstants.FacultyName);
+        await EnsureUserInRoleAsync(userManager, "student1", "student@sims.local", "Student#12345", RoleConstants.StudentName);
 
         if (!await db.Courses.AnyAsync())
         {
@@ -172,6 +164,30 @@ public static class SeedData
                 new Models.Course { Code = "MATH101", Name = "Calculus I", Credits = 4, Department = "Math" }
             );
             await db.SaveChangesAsync();
+        }
+    }
+
+    private static async Task EnsureUserInRoleAsync(UserManager<IdentityUser> userManager, string username, string email, string password, string roleName)
+    {
+        var user = await userManager.FindByNameAsync(username) ?? await userManager.FindByEmailAsync(email);
+        if (user == null)
+        {
+            user = new IdentityUser
+            {
+                UserName = username,
+                Email = email,
+                EmailConfirmed = true
+            };
+            var createResult = await userManager.CreateAsync(user, password);
+            if (!createResult.Succeeded)
+            {
+                return;
+            }
+        }
+
+        if (!await userManager.IsInRoleAsync(user, roleName))
+        {
+            await userManager.AddToRoleAsync(user, roleName);
         }
     }
 }
