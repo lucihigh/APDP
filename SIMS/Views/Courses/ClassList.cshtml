@@ -2,11 +2,20 @@
 @{
     ViewData["Title"] = "Class List";
     var course = (SIMS.Models.Course)ViewData["Course"]!;
+    var q = ViewData["q"] as string;
 }
 <div class="page-header mb-3">
     <div class="page-header-title">Class List - @course.Code @course.Name</div>
     <div class="page-header-subtitle">Grade from the class roster and track who has submitted.</div>
 </div>
+
+<form method="get" class="row g-2 align-items-end mb-3" role="search" aria-label="Search class list">
+    <input type="hidden" name="id" value="@course.Id" />
+    <div class="col-sm-6 col-md-4 col-lg-3">
+        <label class="form-label">Search</label>
+        <input class="form-control" type="search" name="q" value="@(q ?? string.Empty)" placeholder="Name, email, program, year, grade" data-class-search />
+    </div>
+</form>
 
 <div class="card shadow-sm">
     <div class="card-body p-0">
@@ -28,7 +37,16 @@
                 {
                     var student = enrollment.Student;
                     var hasSubmission = !string.IsNullOrWhiteSpace(enrollment.Grade);
-                    <tr>
+                    var searchText = string.Join(" ", new[]
+                    {
+                        student?.FullName,
+                        student?.Email,
+                        student?.Program,
+                        student?.Year?.ToString(),
+                        enrollment.Grade,
+                        enrollment.Semester
+                    }.Where(s => !string.IsNullOrWhiteSpace(s))).ToLowerInvariant();
+                    <tr data-class-row data-search="@searchText">
                         <td>@student?.FullName</td>
                         <td>@student?.Email</td>
                         <td>@student?.Program</td>
@@ -55,8 +73,37 @@
                         </td>
                     </tr>
                 }
+                <tr data-class-empty style="display:none;">
+                    <td colspan="7" class="text-center text-secondary">No students match your search.</td>
+                </tr>
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+
+@section Scripts {
+<script>
+(() => {
+  const input = document.querySelector('[data-class-search]');
+  const rows = Array.from(document.querySelectorAll('[data-class-row]'));
+  const empty = document.querySelector('[data-class-empty]');
+  if (!input || rows.length === 0) return;
+
+  const filter = () => {
+    const term = (input.value || '').trim().toLowerCase();
+    let visible = 0;
+    rows.forEach(row => {
+      const haystack = row.dataset.search || '';
+      const match = term === '' || haystack.includes(term);
+      row.style.display = match ? '' : 'none';
+      if (match) visible++;
+    });
+    if (empty) empty.style.display = visible === 0 ? '' : 'none';
+  };
+
+  input.addEventListener('input', filter);
+  filter();
+})();
+</script>
+}
