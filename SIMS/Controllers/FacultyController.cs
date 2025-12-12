@@ -12,7 +12,7 @@ using SIMS.Services;
 
 namespace SIMS.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public class FacultyController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -24,6 +24,7 @@ namespace SIMS.Controllers
             _userManager = userManager;
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index(string? q)
         {
             var query = _context.FacultyProfiles
@@ -45,6 +46,7 @@ namespace SIMS.Controllers
             return View(await query.ToListAsync());
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
@@ -52,6 +54,7 @@ namespace SIMS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("FirstName,LastName,DateOfBirth,Email,Phone,Address,Department,Title")] FacultyProfile input)
         {
             if (!ModelState.IsValid)
@@ -127,6 +130,7 @@ namespace SIMS.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -137,6 +141,24 @@ namespace SIMS.Controllers
 
             if (faculty == null) return NotFound();
             return View(faculty);
+        }
+
+        [Authorize(Roles = "Faculty")]
+        public async Task<IActionResult> MyProfile()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            var faculty = await _context.FacultyProfiles
+                .AsNoTracking()
+                .FirstOrDefaultAsync(f => f.UserId == user.Id);
+
+            if (faculty == null)
+            {
+                return NotFound();
+            }
+
+            return View("Details", faculty);
         }
     }
 }

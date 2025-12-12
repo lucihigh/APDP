@@ -8,7 +8,14 @@
         <div class="page-header-title mb-1">Faculty details</div>
         <div class="page-header-subtitle">@Model.FullName</div>
     </div>
-    <a class="btn btn-outline-secondary" asp-action="Index">Back to list</a>
+    @if (User.IsInRole("Admin"))
+    {
+        <a class="btn btn-outline-secondary" asp-action="Index">Back to list</a>
+    }
+    else
+    {
+        <a class="btn btn-outline-secondary" asp-controller="Home" asp-action="Index">Home</a>
+    }
 </div>
 
 <div class="card shadow-sm">

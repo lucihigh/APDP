@@ -136,6 +136,8 @@ public class AdminController : Controller
 
         using var reader = new StreamReader(file.OpenReadStream());
         int created = 0, updated = 0;
+        var errors = new List<string>();
+        var parsedRows = new List<(string Email, string First, string Last, string Program, string Phone, string Address, int? Year, double? Gpa, DateOnly? Dob)>();
 
         string? headerLine;
         try
@@ -164,15 +166,25 @@ public class AdminController : Controller
         string? line;
         try
         {
+            var lineNumber = 2; // header is line 1
             while ((line = await reader.ReadLineAsync()) != null)
             {
-                if (string.IsNullOrWhiteSpace(line)) continue;
+                if (string.IsNullOrWhiteSpace(line))
+                {
+                    lineNumber++;
+                    continue;
+                }
 
                 var cols = ParseCsvLine(line);
                 string Get(string key) => TryGetColumn(cols, headerMap, key);
 
                 var email = Get("email");
-                if (string.IsNullOrWhiteSpace(email) || !email.Contains('@')) continue;
+                if (string.IsNullOrWhiteSpace(email) || !email.Contains('@'))
+                {
+                    errors.Add($"Line {lineNumber}: Missing/invalid email.");
+                    lineNumber++;
+                    continue;
+                }
 
                 var first = Get("firstname");
                 var last = Get("lastname");
@@ -181,16 +193,32 @@ public class AdminController : Controller
                 var address = Get("address");
 
                 int? year = null;
-                if (int.TryParse(Get("year"), out var parsedYear))
+                var yearText = Get("year");
+                if (!string.IsNullOrWhiteSpace(yearText))
                 {
-                    year = parsedYear;
+                    if (int.TryParse(yearText, out var parsedYear))
+                    {
+                        year = parsedYear;
+                    }
+                    else
+                    {
+                        errors.Add($"Line {lineNumber}: Year must be a number.");
+                    }
                 }
 
                 double? gpa = null;
-                var gpaText = Get("gpa").Replace(',', '.');
-                if (double.TryParse(gpaText, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedGpa))
+                var rawGpa = Get("gpa");
+                if (!string.IsNullOrWhiteSpace(rawGpa))
                 {
-                    gpa = parsedGpa;
+                    var gpaText = rawGpa.Replace(',', '.');
+                    if (double.TryParse(gpaText, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedGpa))
+                    {
+                        gpa = parsedGpa;
+                    }
+                    else
+                    {
+                        errors.Add($"Line {lineNumber}: GPA is not a valid number.");
+                    }
                 }
 
                 DateOnly? dob = null;
@@ -199,57 +227,76 @@ public class AdminController : Controller
                 {
                     dobText = Get("dob");
                 }
-                if (!string.IsNullOrWhiteSpace(dobText) &&
-                    DateTime.TryParse(dobText, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedDob))
+                if (!string.IsNullOrWhiteSpace(dobText))
                 {
-                    dob = DateOnly.FromDateTime(parsedDob);
-                }
-
-                var user = await _userManager.FindByEmailAsync(email);
-                if (user == null)
-                {
-                    var userId = await UserIdGenerator.GenerateForRoleAsync(_userManager, "Student");
-                    user = new IdentityUser
+                    if (DateTime.TryParse(dobText, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedDob))
                     {
-                        Id = userId,
-                        UserName = email,
-                        Email = email,
-                        EmailConfirmed = true
-                    };
-                    await _userManager.CreateAsync(user, "Student#12345");
-                    await _userManager.AddToRoleAsync(user, "Student");
-                    created++;
-                }
-                else
-                {
-                    if (!UserIdGenerator.IsFormatted(user.Id, "Student"))
-                    {
-                        user = await UserIdRepairService.RepairSingleStudentAsync(_db, _userManager, user, "Student");
+                        dob = DateOnly.FromDateTime(parsedDob);
                     }
-                    updated++;
+                    else
+                    {
+                        errors.Add($"Line {lineNumber}: Date of birth is not a valid date.");
+                    }
                 }
 
-                var student =
-                    await _db.Students.FirstOrDefaultAsync(s => s.UserId == user.Id)
-                    ?? new Student { UserId = user.Id, Email = email };
-
-                student.FirstName = first;
-                student.LastName = last;
-                student.Program = program;
-                student.Year = year;
-                student.Email = email;
-                student.Phone = phone;
-                student.Address = address;
-                student.GPA = gpa;
-                student.DateOfBirth = dob;
-
-                _db.Students.Update(student);
+                parsedRows.Add((email, first, last, program, phone, address, year, gpa, dob));
+                lineNumber++;
             }
         }
         catch
         {
             ModelState.AddModelError(string.Empty, "The file format is invalid. Please ensure the CSV columns follow the template and values are well-formed.");
             return View();
+        }
+
+        if (errors.Any())
+        {
+            ModelState.AddModelError(string.Empty, "Invalid data found: " + string.Join(" | ", errors.Take(5)) + (errors.Count > 5 ? $" (+{errors.Count - 5} more)" : string.Empty));
+            return View();
+        }
+
+        foreach (var row in parsedRows)
+        {
+            var (email, first, last, program, phone, address, year, gpa, dob) = row;
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                var userId = await UserIdGenerator.GenerateForRoleAsync(_userManager, "Student");
+                user = new IdentityUser
+                {
+                    Id = userId,
+                    UserName = email,
+                    Email = email,
+                    EmailConfirmed = true
+                };
+                await _userManager.CreateAsync(user, "Student#12345");
+                await _userManager.AddToRoleAsync(user, "Student");
+                created++;
+            }
+            else
+            {
+                if (!UserIdGenerator.IsFormatted(user.Id, "Student"))
+                {
+                    user = await UserIdRepairService.RepairSingleStudentAsync(_db, _userManager, user, "Student");
+                }
+                updated++;
+            }
+
+            var student =
+                await _db.Students.FirstOrDefaultAsync(s => s.UserId == user.Id)
+                ?? new Student { UserId = user.Id, Email = email };
+
+            student.FirstName = first;
+            student.LastName = last;
+            student.Program = program;
+            student.Year = year;
+            student.Email = email;
+            student.Phone = phone;
+            student.Address = address;
+            student.GPA = gpa;
+            student.DateOfBirth = dob;
+
+            _db.Students.Update(student);
         }
 
         await _db.SaveChangesAsync();
