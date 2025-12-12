@@ -227,6 +227,58 @@ namespace SIMS.Controllers
             return View(enrollment);
         }
 
+        // GET: Enrollments/Grade/5
+        public async Task<IActionResult> Grade(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var enrollment = await _context.Enrollments
+                .Include(e => e.Student)
+                .Include(e => e.Course)
+                .FirstOrDefaultAsync(e => e.Id == id);
+            if (enrollment == null)
+            {
+                return NotFound();
+            }
+
+            return View(enrollment);
+        }
+
+        // POST: Enrollments/Grade/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Grade(int id, [Bind("Id,Grade")] Enrollment input)
+        {
+            var enrollment = await _context.Enrollments
+                .Include(e => e.Student)
+                .Include(e => e.Course)
+                .FirstOrDefaultAsync(e => e.Id == id);
+            if (enrollment == null)
+            {
+                return NotFound();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(enrollment);
+            }
+
+            enrollment.Grade = input.Grade;
+            _context.Update(enrollment);
+            await _context.SaveChangesAsync();
+
+            if (enrollment.Student?.UserId != null && !string.IsNullOrWhiteSpace(enrollment.Grade))
+            {
+                await _notifier.NotifyUserAsync(enrollment.Student.UserId, $"Your grade for {enrollment.Course?.Code} was updated to {enrollment.Grade}", "/Students/MyGrades");
+            }
+
+            TempData["Success"] = "Grade saved successfully.";
+            return RedirectToAction(nameof(Index));
+        }
+
         // GET: Enrollments/Delete/5
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)

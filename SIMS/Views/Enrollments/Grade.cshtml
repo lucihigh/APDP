@@ -1,0 +1,47 @@
+@model SIMS.Models.Enrollment
+
+@{
+    ViewData["Title"] = "Grade";
+}
+
+<div class="page-header d-flex flex-wrap align-items-center justify-content-between gap-2">
+    <div>
+        <div class="page-header-title">Grade Enrollment</div>
+        <div class="page-header-subtitle">Update the score for this student and course.</div>
+    </div>
+    <a class="btn btn-outline-secondary" asp-action="Index"><i class="bi bi-arrow-left"></i> Back to list</a>
+ </div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form asp-action="Grade" method="post" class="row g-3">
+            <input type="hidden" asp-for="Id" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="col-md-6">
+                <label class="form-label">Student</label>
+                <input class="form-control" value="@($"{Model.Student?.FirstName} {Model.Student?.LastName} ({Model.Student?.Email})")" readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Course</label>
+                <input class="form-control" value="@($"{Model.Course?.Code} - {Model.Course?.Name}")" readonly />
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="Grade" class="form-label"></label>
+                <input asp-for="Grade" class="form-control" placeholder="e.g. A, B+, 9.0" />
+                <span asp-validation-for="Grade" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-8 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check2-circle me-1"></i> Save grade</button>
+                <a class="btn btn-outline-secondary" asp-action="Index">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
