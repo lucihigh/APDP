@@ -1,0 +1,108 @@
+@model SIMS.Models.FacultyManageViewModel
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="page-header d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+    <div>
+        <div class="page-header-title">My Profile</div>
+        <div class="page-header-subtitle">Update your info or change your password.</div>
+    </div>
+    <a class="btn btn-outline-secondary" asp-controller="Home" asp-action="Index">Home</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-12 col-xl-7">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="fw-semibold text-secondary text-uppercase small">Profile</div>
+                    <span class="badge bg-secondary-subtle text-secondary">Faculty</span>
+                </div>
+                <form asp-action="UpdateProfile" method="post" class="row g-3">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="Profile.Id" />
+                    <div class="col-md-6">
+                        <label asp-for="Profile.FirstName" class="form-label"></label>
+                        <input asp-for="Profile.FirstName" class="form-control" />
+                        <span asp-validation-for="Profile.FirstName" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Profile.LastName" class="form-label"></label>
+                        <input asp-for="Profile.LastName" class="form-control" />
+                        <span asp-validation-for="Profile.LastName" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Profile.DateOfBirth" class="form-label"></label>
+                        <input asp-for="Profile.DateOfBirth" class="form-control" type="date" />
+                        <span asp-validation-for="Profile.DateOfBirth" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Profile.Email" class="form-label"></label>
+                        <input asp-for="Profile.Email" class="form-control" readonly />
+                        <div class="form-text">Email is managed by the administrator.</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Profile.Phone" class="form-label"></label>
+                        <input asp-for="Profile.Phone" class="form-control" />
+                        <span asp-validation-for="Profile.Phone" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Profile.Address" class="form-label"></label>
+                        <input asp-for="Profile.Address" class="form-control" />
+                        <span asp-validation-for="Profile.Address" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Profile.Department" class="form-label"></label>
+                        <input asp-for="Profile.Department" class="form-control" />
+                        <span asp-validation-for="Profile.Department" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Profile.Title" class="form-label"></label>
+                        <input asp-for="Profile.Title" class="form-control" />
+                        <span asp-validation-for="Profile.Title" class="text-danger"></span>
+                    </div>
+                    <div class="d-flex justify-content-end gap-2 mt-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save me-1"></i> Save changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-xl-5">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="fw-semibold text-secondary text-uppercase small mb-3">Change password</div>
+                <form asp-action="ChangePassword" method="post" class="row g-3">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="col-12">
+                        <label asp-for="Password.CurrentPassword" class="form-label"></label>
+                        <input asp-for="Password.CurrentPassword" class="form-control" />
+                        <span asp-validation-for="Password.CurrentPassword" class="text-danger"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Password.NewPassword" class="form-label"></label>
+                        <input asp-for="Password.NewPassword" class="form-control" />
+                        <span asp-validation-for="Password.NewPassword" class="text-danger"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Password.ConfirmPassword" class="form-label"></label>
+                        <input asp-for="Password.ConfirmPassword" class="form-control" />
+                        <span asp-validation-for="Password.ConfirmPassword" class="text-danger"></span>
+                    </div>
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="submit" class="btn btn-outline-primary">
+                            <i class="bi bi-key me-1"></i> Update password
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

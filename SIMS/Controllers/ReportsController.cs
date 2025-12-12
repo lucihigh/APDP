@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SIMS.Data;
+using System.Globalization;
+using System.Text;
 
 namespace SIMS.Controllers;
 
@@ -42,8 +44,8 @@ public class ReportsController : Controller
         sw.WriteLine($"Course,{course?.Code},{course?.Name}");
         sw.WriteLine("Email,FirstName,LastName,Program,Year");
         foreach (var s in rows) sw.WriteLine($"{s.Email},{s.FirstName},{s.LastName},{s.Program},{s.Year}");
-        var data = System.Text.Encoding.UTF8.GetPreamble().Concat(System.Text.Encoding.UTF8.GetBytes(sw.ToString())).ToArray();
-        return File(data, "text/csv; charset=utf-8", $"roster_{course?.Code}.csv");
+        var payload = AddBom(sw.ToString());
+        return File(payload, "text/csv; charset=utf-8", $"roster_{course?.Code}.csv");
     }
 
     public async Task<FileResult> GradebookCsv(int courseId)
@@ -66,8 +68,8 @@ public class ReportsController : Controller
         sw.WriteLine($"Course,{course?.Code},{course?.Name}");
         sw.WriteLine("Email,Name,Semester,Grade");
         foreach (var e in rows) sw.WriteLine($"{e.Student?.Email},{e.Student?.FirstName} {e.Student?.LastName},{e.Semester},{e.Grade}");
-        var data = System.Text.Encoding.UTF8.GetPreamble().Concat(System.Text.Encoding.UTF8.GetBytes(sw.ToString())).ToArray();
-        return File(data, "text/csv; charset=utf-8", $"gradebook_{course?.Code}.csv");
+        var payload = AddBom(sw.ToString());
+        return File(payload, "text/csv; charset=utf-8", $"gradebook_{course?.Code}.csv");
     }
 
     [Authorize(Roles = "Admin")]
@@ -81,7 +83,83 @@ public class ReportsController : Controller
         sw.WriteLine($"Students,{students}");
         sw.WriteLine($"Courses,{courses}");
         sw.WriteLine($"Enrollments,{enrollments}");
-        var data = System.Text.Encoding.UTF8.GetPreamble().Concat(System.Text.Encoding.UTF8.GetBytes(sw.ToString())).ToArray();
-        return File(data, "text/csv; charset=utf-8", "summary.csv");
+        var payload = AddBom(sw.ToString());
+        return File(payload, "text/csv; charset=utf-8", "summary.csv");
+    }
+
+    [HttpGet]
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public async Task<IActionResult> CourseMetrics(int courseId)
+    {
+        var course = await _db.Courses.AsNoTracking().FirstOrDefaultAsync(c => c.Id == courseId);
+        if (course == null) return NotFound();
+
+        var enrollments = await _db.Enrollments
+            .Where(e => e.CourseId == courseId)
+            .Include(e => e.Student)
+            .AsNoTracking()
+            .ToListAsync();
+
+        var total = enrollments.Count;
+        var graded = enrollments.Where(e => !string.IsNullOrWhiteSpace(e.Grade)).ToList();
+        var pending = total - graded.Count;
+
+        var gradeValues = graded
+            .Select(e => double.TryParse(e.Grade, NumberStyles.Any, CultureInfo.InvariantCulture, out var g) ? g : (double?)null)
+            .Where(g => g.HasValue)
+            .Select(g => g!.Value)
+            .ToList();
+
+        double? average = gradeValues.Any() ? gradeValues.Average() : null;
+
+        int Bucket(Func<double, bool> predicate) => gradeValues.Count(predicate);
+        var distribution = new[]
+        {
+            new { label = "9 - 10", count = Bucket(g => g >= 9) },
+            new { label = "8 - 8.9", count = Bucket(g => g >= 8 && g < 9) },
+            new { label = "6 - 7.9", count = Bucket(g => g >= 6 && g < 8) },
+            new { label = "< 6", count = Bucket(g => g < 6) },
+        };
+
+        var programs = enrollments
+            .GroupBy(e => string.IsNullOrWhiteSpace(e.Student?.Program) ? "Unknown" : e.Student!.Program!)
+            .Select(g => new { label = g.Key, count = g.Count() })
+            .OrderByDescending(x => x.count)
+            .ToList();
+
+        var students = enrollments
+            .Select(e => new
+            {
+                name = $"{e.Student!.FirstName} {e.Student.LastName}".Trim(),
+                email = e.Student.Email,
+                program = e.Student.Program,
+                year = e.Student.Year,
+                grade = e.Grade,
+                semester = e.Semester
+            })
+            .ToList();
+
+        return Json(new
+        {
+            course = new { course.Id, course.Code, course.Name },
+            total,
+            graded = graded.Count,
+            pending,
+            averageGrade = average,
+            distribution,
+            programs,
+            students
+        });
+    }
+
+    private static byte[] AddBom(string content)
+    {
+        var utf8 = new UTF8Encoding(encoderShouldEmitUTF8Identifier: true);
+        var preamble = utf8.GetPreamble();
+        var body = utf8.GetBytes(content);
+        var payload = new byte[preamble.Length + body.Length];
+        Buffer.BlockCopy(preamble, 0, payload, 0, preamble.Length);
+        Buffer.BlockCopy(body, 0, payload, preamble.Length, body.Length);
+        return payload;
     }
 }

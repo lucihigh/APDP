@@ -59,7 +59,8 @@ main.flex-grow-1 { display:block; }
   opacity: 1;
   transform: translateY(0);
   transition: opacity .18s ease-out, transform .18s ease-out;
-  padding-bottom: calc(var(--sims-footer-height) + 12px);
+  /* extra space so last table rows/controls are not hidden behind the footer */
+  padding-bottom: calc(var(--sims-footer-height) + 96px);
 }
 
 .page-shell.page-transition-out {
@@ -498,4 +499,3 @@ table.table > :not(caption) > * > * {
 .admin-hero{
   background: radial-gradient(circle at top, #020617 0, #020617 40%, #000000 100%);
 }
-

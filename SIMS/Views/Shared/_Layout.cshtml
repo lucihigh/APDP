@@ -33,15 +33,14 @@
                         {
                             <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Students" asp-action="Index">Students</a></li>
                             <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Courses" asp-action="Index">Courses</a></li>
-                            <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Enrollments" asp-action="Index">Enrollments</a></li>
                             <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Assessments" asp-action="Index">Assessments</a></li>
                             <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="ClassSessions" asp-action="Index">Sessions</a></li>
                         }
                         else if (User.IsInRole("Faculty"))
                         {
                             <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Courses" asp-action="Index">Courses</a></li>
-                            <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Enrollments" asp-action="Index">Enrollments</a></li>
                             <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Reports" asp-action="Index">Reports</a></li>
+                            <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Faculty" asp-action="Manage">Profile</a></li>
                         }
                         else if (User.IsInRole("Student"))
                         {
@@ -68,7 +67,7 @@
         </nav>
     </header>
     <div class="container-fluid px-4 flex-grow-1">
-        <main id="main" role="main" class="pb-3 flex-grow-1 page-shell">
+        <main id="main" role="main" class="flex-grow-1 page-shell">
             <partial name="_Alerts" />
             @RenderBody()
         </main>
@@ -83,6 +82,3 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
-
-
-

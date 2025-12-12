@@ -56,18 +56,35 @@ namespace SIMS.Controllers
         }
 
         // GET: Courses/ClassList/5
-        public async Task<IActionResult> ClassList(int? id)
+        public async Task<IActionResult> ClassList(int? id, string? q)
         {
             if (id == null) return NotFound();
             var course = await _context.Courses.FirstOrDefaultAsync(c => c.Id == id);
             if (course == null) return NotFound();
-            var students = await _context.Enrollments
+
+            var enrollmentsQuery = _context.Enrollments
                 .Where(e => e.CourseId == id)
                 .Include(e => e.Student)
-                .Select(e => e.Student!)
-                .ToListAsync();
+                .AsNoTracking();
+
+            if (!string.IsNullOrWhiteSpace(q))
+            {
+                var term = q.Trim();
+                var termLower = term.ToLower();
+                int? yearFilter = int.TryParse(term, out var parsedYear) ? parsedYear : null;
+                enrollmentsQuery = enrollmentsQuery.Where(e =>
+                    (e.Student!.FirstName + " " + e.Student.LastName).ToLower().Contains(termLower) ||
+                    (e.Student.Email != null && e.Student.Email.ToLower().Contains(termLower)) ||
+                    (e.Student.Program != null && e.Student.Program.ToLower().Contains(termLower)) ||
+                    (yearFilter != null && e.Student.Year == yearFilter) ||
+                    (e.Grade != null && e.Grade.ToLower().Contains(termLower)) ||
+                    (e.Semester != null && e.Semester.ToLower().Contains(termLower)));
+            }
+
+            var enrollments = await enrollmentsQuery.ToListAsync();
             ViewData["Course"] = course;
-            return View(students);
+            ViewData["q"] = q;
+            return View(enrollments);
         }
 
         // GET: Courses/Create

@@ -24,7 +24,7 @@ public class EnrollmentValidationTests
             StudentId = 1,
             CourseId = 2,
             Semester = "2025S1",
-            Grade = "A"
+            Grade = "8"
         };
 
         var results = Validate(model);
@@ -54,7 +54,7 @@ public class EnrollmentValidationTests
             StudentId = 1,
             CourseId = 2,
             Semester = new string('X', 25),
-            Grade = "B"
+            Grade = "9"
         };
 
         var results = Validate(model);
@@ -68,7 +68,7 @@ public class EnrollmentValidationTests
         {
             CourseId = 2,
             Semester = "2025S1",
-            Grade = "A"
+            Grade = "7"
         };
 
         var results = Validate(model);

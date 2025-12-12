@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using SIMS.Data;
 using SIMS.Models;
 using SIMS.Services;
+using ClosedXML.Excel;
 using System.Text;
 using System.Globalization;
 
@@ -134,7 +135,21 @@ public class AdminController : Controller
             await _db.SaveChangesAsync();
         }
 
-        using var reader = new StreamReader(file.OpenReadStream());
+        // Read file content with encoding fallback: prefer UTF-8 (with BOM/strict), fallback to Windows-1258 (common for Vietnamese CSV from Excel)
+        await using var ms = new MemoryStream();
+        await file.CopyToAsync(ms);
+        var bytes = ms.ToArray();
+        string content;
+        try
+        {
+            content = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true).GetString(bytes);
+        }
+        catch (DecoderFallbackException)
+        {
+            content = Encoding.GetEncoding(1258).GetString(bytes);
+        }
+
+        using var reader = new StringReader(content);
         int created = 0, updated = 0;
         var errors = new List<string>();
         var parsedRows = new List<(string Email, string First, string Last, string Program, string Phone, string Address, int? Year, double? Gpa, DateOnly? Dob)>();
@@ -331,19 +346,65 @@ public class AdminController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // Export Students CSV
+    // Export Students Excel (to preserve Unicode in Excel)
     public async Task<FileResult> ExportStudents()
     {
         var rows = await _db.Students.AsNoTracking().ToListAsync();
-        var sw = new StringWriter();
-        sw.WriteLine("Email,FirstName,LastName,Program,Year,GPA");
+        using var workbook = new XLWorkbook();
+        var ws = workbook.AddWorksheet("Students");
+
+        // Header
+        ws.Cell(1, 1).Value = "Email";
+        ws.Cell(1, 2).Value = "FirstName";
+        ws.Cell(1, 3).Value = "LastName";
+        ws.Cell(1, 4).Value = "Program";
+        ws.Cell(1, 5).Value = "Year";
+        ws.Cell(1, 6).Value = "GPA";
+
+        var row = 2;
         foreach (var s in rows)
         {
-            sw.WriteLine($"{s.Email},{s.FirstName},{s.LastName},{s.Program},{s.Year},{s.GPA}");
+            ws.Cell(row, 1).Value = s.Email;
+            ws.Cell(row, 2).Value = FixVietnameseMojibake(s.FirstName);
+            ws.Cell(row, 3).Value = FixVietnameseMojibake(s.LastName);
+            ws.Cell(row, 4).Value = s.Program;
+            ws.Cell(row, 5).Value = s.Year;
+            ws.Cell(row, 6).Value = s.GPA;
+            row++;
         }
-        var utf8Bom = Encoding.UTF8.GetPreamble();
-        var data = utf8Bom.Concat(Encoding.UTF8.GetBytes(sw.ToString())).ToArray();
-        return File(data, "text/csv; charset=utf-8", "students.csv");
+
+        ws.Columns().AdjustToContents();
+
+        using var stream = new MemoryStream();
+        workbook.SaveAs(stream);
+        var bytes = stream.ToArray();
+        return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "students.xlsx");
+    }
+
+    // Attempt to repair UTF-8 text that was decoded as Latin-1/ANSI (common mojibake like "Tá»‘ng VÄƒn Anh")
+    private static string FixVietnameseMojibake(string? input)
+    {
+        if (string.IsNullOrEmpty(input))
+        {
+            return string.Empty;
+        }
+
+        try
+        {
+            var rawBytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(input);
+            var redecoded = Encoding.UTF8.GetString(rawBytes);
+
+            if (!string.Equals(redecoded, input, StringComparison.Ordinal) && redecoded.Any(c => c > 127))
+            {
+                return redecoded;
+            }
+        }
+        catch
+        {
+            // ignore and fall back
+        }
+
+        return input;
     }
 
     private static Dictionary<string, int> BuildHeaderIndex(string headerLine)

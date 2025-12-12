@@ -28,7 +28,7 @@ public class CsvReportHelperTests
         db.Courses.Add(course);
         db.Students.Add(student);
         db.SaveChanges();
-        db.Enrollments.Add(new Enrollment { CourseId = course.Id, StudentId = student.Id, Semester = "2025S1", Grade = "A" });
+        db.Enrollments.Add(new Enrollment { CourseId = course.Id, StudentId = student.Id, Semester = "2025S1", Grade = "9" });
         db.SaveChanges();
         var controller = new ReportsController(db);
         return (db, controller, course, student);
@@ -58,7 +58,7 @@ public class CsvReportHelperTests
 
         Assert.Contains("Email,Name,Semester,Grade", text);
         Assert.Contains($"{student.Email}", text);
-        Assert.Contains("A", text);
+        Assert.Contains("9", text);
         db.Dispose();
     }
 
@@ -88,7 +88,7 @@ public class CsvReportHelperTests
         var (db, controller, course, _) = SeedCourseWithStudent();
         var result = await controller.CourseRosterCsv(course.Id);
         var file = Assert.IsType<FileContentResult>(result);
-        Assert.Equal("text/csv", file.ContentType);
+        Assert.Equal("text/csv; charset=utf-8", file.ContentType);
         db.Dispose();
     }
 }
