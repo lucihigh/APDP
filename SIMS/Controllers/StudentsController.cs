@@ -320,7 +320,11 @@ namespace SIMS.Controllers
             var user = await _userManager.GetUserAsync(User);
             var student = await _context.Students.FirstOrDefaultAsync(s => s.Id == input.Id && s.UserId == user!.Id);
             if (student == null) return NotFound();
-            if (!ModelState.IsValid) return View(input);
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Please fix the highlighted fields.";
+                return View(input);
+            }
             student.FirstName = input.FirstName;
             student.LastName = input.LastName;
             student.DateOfBirth = input.DateOfBirth;
@@ -329,6 +333,7 @@ namespace SIMS.Controllers
             student.Program = input.Program;
             student.Year = input.Year;
             await _context.SaveChangesAsync();
+            TempData["Success"] = "Profile updated successfully.";
             return RedirectToAction(nameof(MyProfile));
         }
 
