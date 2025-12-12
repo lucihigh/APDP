@@ -255,7 +255,26 @@ public class AdminController : Controller
             return View();
         }
 
-        foreach (var row in parsedRows)
+        // handle duplicate emails in the uploaded file
+        var distinctRows = parsedRows
+            .GroupBy(r => r.Email, StringComparer.OrdinalIgnoreCase)
+            .Select(g =>
+            {
+                if (g.Count() > 1)
+                {
+                    errors.Add($"Duplicate email in file: {g.Key}");
+                }
+                return g.First();
+            })
+            .ToList();
+
+        if (errors.Any())
+        {
+            ModelState.AddModelError(string.Empty, "Invalid data found: " + string.Join(" | ", errors.Take(5)) + (errors.Count > 5 ? $" (+{errors.Count - 5} more)" : string.Empty));
+            return View();
+        }
+
+        foreach (var row in distinctRows)
         {
             var (email, first, last, program, phone, address, year, gpa, dob) = row;
             var user = await _userManager.FindByEmailAsync(email);
@@ -299,7 +318,15 @@ public class AdminController : Controller
             _db.Students.Update(student);
         }
 
-        await _db.SaveChangesAsync();
+        try
+        {
+            await _db.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            ModelState.AddModelError(string.Empty, "Failed to save data. Please check for duplicate emails or invalid values in the file.");
+            return View();
+        }
         TempData["Success"] = $"Imported: {created} created, {updated} users updated";
         return RedirectToAction(nameof(Index));
     }

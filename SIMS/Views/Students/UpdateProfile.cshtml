@@ -11,7 +11,7 @@
                     <div>
                         <p class="text-uppercase fw-semibold small text-accent mb-1">Profile</p>
                         <h1 class="h3 fw-bold mb-1">Update Profile</h1>
-                        <p class="text-muted small mb-0 form-note">Giữ thông tin cá nhân của bạn luôn chính xác.</p>
+                        <p class="text-muted small mb-0 form-note">Keep your personal information accurate.</p>
                     </div>
                     <div class="d-flex gap-2 flex-wrap">
                         <a asp-action="MyProfile" class="btn btn-outline-secondary btn-sm">
@@ -25,6 +25,7 @@
                     <input type="hidden" asp-for="Id" />
                     <input type="hidden" asp-for="Program" />
                     <input type="hidden" asp-for="Year" />
+                    <input type="hidden" asp-for="Email" />
                     <div class="col-md-6">
                         <label asp-for="FirstName" class="form-label"></label>
                         <input asp-for="FirstName" class="form-control" />

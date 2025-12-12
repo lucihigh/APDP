@@ -320,6 +320,9 @@ namespace SIMS.Controllers
             var user = await _userManager.GetUserAsync(User);
             var student = await _context.Students.FirstOrDefaultAsync(s => s.Id == input.Id && s.UserId == user!.Id);
             if (student == null) return NotFound();
+            ModelState.Remove(nameof(Student.Email));
+            ModelState.Remove(nameof(Student.Program));
+            ModelState.Remove(nameof(Student.Year));
             if (!ModelState.IsValid)
             {
                 TempData["Error"] = "Please fix the highlighted fields.";
