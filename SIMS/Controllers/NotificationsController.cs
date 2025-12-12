@@ -6,7 +6,7 @@ using SIMS.Data;
 
 namespace SIMS.Controllers;
 
-[Authorize]
+[Authorize(Roles = "Student")]
 public class NotificationsController : Controller
 {
     private readonly ApplicationDbContext _db;
@@ -36,4 +36,3 @@ public class NotificationsController : Controller
         return RedirectToAction(nameof(Index));
     }
 }
-
