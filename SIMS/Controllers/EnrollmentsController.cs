@@ -326,7 +326,7 @@ namespace SIMS.Controllers
 
             TempData["Success"] = "Grade saved successfully.";
             // Add a cache-busting token to avoid stale page responses
-            return RedirectToAction(nameof(Index), new { t = Guid.NewGuid().ToString("N") });
+            return RedirectToAction("ClassList", "Courses", new { id = enrollment.CourseId, t = Guid.NewGuid().ToString("N") });
         }
 
         // GET: Enrollments/Delete/5
