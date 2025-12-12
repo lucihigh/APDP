@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SIMS.Data;
 using System.Globalization;
+using System.Text;
 
 namespace SIMS.Controllers;
 
@@ -43,7 +44,8 @@ public class ReportsController : Controller
         sw.WriteLine($"Course,{course?.Code},{course?.Name}");
         sw.WriteLine("Email,FirstName,LastName,Program,Year");
         foreach (var s in rows) sw.WriteLine($"{s.Email},{s.FirstName},{s.LastName},{s.Program},{s.Year}");
-        return File(System.Text.Encoding.UTF8.GetBytes(sw.ToString()), "text/csv", $"roster_{course?.Code}.csv");
+        var payload = AddBom(sw.ToString());
+        return File(payload, "text/csv; charset=utf-8", $"roster_{course?.Code}.csv");
     }
 
     public async Task<FileResult> GradebookCsv(int courseId)
@@ -66,7 +68,8 @@ public class ReportsController : Controller
         sw.WriteLine($"Course,{course?.Code},{course?.Name}");
         sw.WriteLine("Email,Name,Semester,Grade");
         foreach (var e in rows) sw.WriteLine($"{e.Student?.Email},{e.Student?.FirstName} {e.Student?.LastName},{e.Semester},{e.Grade}");
-        return File(System.Text.Encoding.UTF8.GetBytes(sw.ToString()), "text/csv", $"gradebook_{course?.Code}.csv");
+        var payload = AddBom(sw.ToString());
+        return File(payload, "text/csv; charset=utf-8", $"gradebook_{course?.Code}.csv");
     }
 
     [Authorize(Roles = "Admin")]
@@ -80,7 +83,8 @@ public class ReportsController : Controller
         sw.WriteLine($"Students,{students}");
         sw.WriteLine($"Courses,{courses}");
         sw.WriteLine($"Enrollments,{enrollments}");
-        return File(System.Text.Encoding.UTF8.GetBytes(sw.ToString()), "text/csv", "summary.csv");
+        var payload = AddBom(sw.ToString());
+        return File(payload, "text/csv; charset=utf-8", "summary.csv");
     }
 
     [HttpGet]
@@ -146,5 +150,16 @@ public class ReportsController : Controller
             programs,
             students
         });
+    }
+
+    private static byte[] AddBom(string content)
+    {
+        var utf8 = new UTF8Encoding(encoderShouldEmitUTF8Identifier: true);
+        var preamble = utf8.GetPreamble();
+        var body = utf8.GetBytes(content);
+        var payload = new byte[preamble.Length + body.Length];
+        Buffer.BlockCopy(preamble, 0, payload, 0, preamble.Length);
+        Buffer.BlockCopy(body, 0, payload, preamble.Length, body.Length);
+        return payload;
     }
 }
