@@ -1,0 +1,14 @@
+@model int
+@{
+    var unread = Model;
+}
+<a class="btn btn-sm btn-outline-primary me-2 position-relative" data-app-link="true" asp-controller="Notifications" asp-action="Index">
+    <i class="bi bi-bell"></i> Notifications
+    @if (unread > 0)
+    {
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            @unread
+            <span class="visually-hidden">unread notifications</span>
+        </span>
+    }
+</a>

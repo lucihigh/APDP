@@ -323,6 +323,9 @@ namespace SIMS.Controllers
             if (!ModelState.IsValid)
             {
                 TempData["Error"] = "Please fix the highlighted fields.";
+                // Preserve immutable fields for display
+                input.Program = student.Program;
+                input.Year = student.Year;
                 return View(input);
             }
             student.FirstName = input.FirstName;

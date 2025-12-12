@@ -55,7 +55,7 @@
                     </ul><div class="d-flex align-items-center gap-2">
                         @if (User.IsInRole("Student"))
                         {
-                            <a class="btn btn-sm btn-outline-primary me-2" data-app-link="true" asp-controller="Notifications" asp-action="Index"><i class="bi bi-bell"></i> Notifications</a>
+                            @await Component.InvokeAsync("UnreadNotifications")
                         }
                         @if (User.IsInRole("Admin"))
                         {
