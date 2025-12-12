@@ -19,6 +19,7 @@ public class EnrollmentBulkCreateViewModel
     public string? Semester { get; set; }
 
     [StringLength(5)]
+    [RegularExpression(@"^(10(\.0+)?|[1-9](\.[0-9]+)?)$|^$", ErrorMessage = "Grade must be a number between 1 and 10.")]
     public string? Grade { get; set; }
 
     public IEnumerable<SelectListItem> Courses { get; set; } = Array.Empty<SelectListItem>();
