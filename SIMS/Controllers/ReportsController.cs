@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SIMS.Data;
+using System.Globalization;
 
 namespace SIMS.Controllers;
 
@@ -80,5 +81,56 @@ public class ReportsController : Controller
         sw.WriteLine($"Courses,{courses}");
         sw.WriteLine($"Enrollments,{enrollments}");
         return File(System.Text.Encoding.UTF8.GetBytes(sw.ToString()), "text/csv", "summary.csv");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> CourseMetrics(int courseId)
+    {
+        var course = await _db.Courses.AsNoTracking().FirstOrDefaultAsync(c => c.Id == courseId);
+        if (course == null) return NotFound();
+
+        var enrollments = await _db.Enrollments
+            .Where(e => e.CourseId == courseId)
+            .Include(e => e.Student)
+            .AsNoTracking()
+            .ToListAsync();
+
+        var total = enrollments.Count;
+        var graded = enrollments.Where(e => !string.IsNullOrWhiteSpace(e.Grade)).ToList();
+        var pending = total - graded.Count;
+
+        var gradeValues = graded
+            .Select(e => double.TryParse(e.Grade, NumberStyles.Any, CultureInfo.InvariantCulture, out var g) ? g : (double?)null)
+            .Where(g => g.HasValue)
+            .Select(g => g!.Value)
+            .ToList();
+
+        double? average = gradeValues.Any() ? gradeValues.Average() : null;
+
+        int Bucket(Func<double, bool> predicate) => gradeValues.Count(predicate);
+        var distribution = new[]
+        {
+            new { label = "9 - 10", count = Bucket(g => g >= 9) },
+            new { label = "8 - 8.9", count = Bucket(g => g >= 8 && g < 9) },
+            new { label = "6 - 7.9", count = Bucket(g => g >= 6 && g < 8) },
+            new { label = "< 6", count = Bucket(g => g < 6) },
+        };
+
+        var programs = enrollments
+            .GroupBy(e => string.IsNullOrWhiteSpace(e.Student?.Program) ? "Unknown" : e.Student!.Program!)
+            .Select(g => new { label = g.Key, count = g.Count() })
+            .OrderByDescending(x => x.count)
+            .ToList();
+
+        return Json(new
+        {
+            course = new { course.Id, course.Code, course.Name },
+            total,
+            graded = graded.Count,
+            pending,
+            averageGrade = average,
+            distribution,
+            programs
+        });
     }
 }
