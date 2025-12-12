@@ -40,6 +40,7 @@
                         {
                             <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Courses" asp-action="Index">Courses</a></li>
                             <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Reports" asp-action="Index">Reports</a></li>
+                            <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Faculty" asp-action="Manage">Profile</a></li>
                         }
                         else if (User.IsInRole("Student"))
                         {
@@ -81,4 +82,3 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
-

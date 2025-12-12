@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SIMS.Data;
 using SIMS.Models;
@@ -149,16 +148,126 @@ namespace SIMS.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Challenge();
 
+            return RedirectToAction(nameof(Manage));
+        }
+
+        [Authorize(Roles = "Faculty")]
+        public async Task<IActionResult> Manage()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
             var faculty = await _context.FacultyProfiles
-                .AsNoTracking()
                 .FirstOrDefaultAsync(f => f.UserId == user.Id);
 
-            if (faculty == null)
+            if (faculty == null) return NotFound();
+
+            var vm = new FacultyManageViewModel
             {
-                return NotFound();
+                Profile = new FacultyProfileEditViewModel
+                {
+                    Id = faculty.Id,
+                    FirstName = faculty.FirstName,
+                    LastName = faculty.LastName,
+                    DateOfBirth = faculty.DateOfBirth,
+                    Email = faculty.Email,
+                    Phone = faculty.Phone,
+                    Address = faculty.Address,
+                    Department = faculty.Department,
+                    Title = faculty.Title
+                },
+                Password = new FacultyChangePasswordViewModel()
+            };
+
+            return View("Manage", vm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Faculty")]
+        public async Task<IActionResult> UpdateProfile([Bind(Prefix = "Profile")] FacultyProfileEditViewModel input)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            var faculty = await _context.FacultyProfiles.FirstOrDefaultAsync(f => f.UserId == user.Id);
+            if (faculty == null) return NotFound();
+
+            // email is fixed for faculty; enforce original value to avoid accidental edits
+            input.Email = faculty.Email;
+            ModelState.Remove("Profile.Email");
+            ModelState.Remove("Email");
+
+            if (!ModelState.IsValid)
+            {
+                return View("Manage", BuildManageViewModel(faculty, input, new FacultyChangePasswordViewModel()));
             }
 
-            return View("Details", faculty);
+            faculty.FirstName = input.FirstName;
+            faculty.LastName = input.LastName;
+            faculty.DateOfBirth = input.DateOfBirth;
+            faculty.Phone = input.Phone;
+            faculty.Address = input.Address;
+            faculty.Department = input.Department;
+            faculty.Title = input.Title;
+
+            _context.FacultyProfiles.Update(faculty);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Profile updated.";
+            return RedirectToAction(nameof(Manage));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Faculty")]
+        public async Task<IActionResult> ChangePassword([Bind(Prefix = "Password")] FacultyChangePasswordViewModel input)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            var faculty = await _context.FacultyProfiles.FirstOrDefaultAsync(f => f.UserId == user.Id);
+            if (faculty == null) return NotFound();
+
+            if (!ModelState.IsValid)
+            {
+                return View("Manage", BuildManageViewModel(faculty, null, input));
+            }
+
+            var result = await _userManager.ChangePasswordAsync(user, input.CurrentPassword, input.NewPassword);
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                return View("Manage", BuildManageViewModel(faculty, null, input));
+            }
+
+            TempData["Success"] = "Password updated.";
+            return RedirectToAction(nameof(Manage));
+        }
+
+        private FacultyManageViewModel BuildManageViewModel(FacultyProfile faculty, FacultyProfileEditViewModel? profileInput, FacultyChangePasswordViewModel? passwordInput)
+        {
+            var profileVm = profileInput ?? new FacultyProfileEditViewModel
+            {
+                Id = faculty.Id,
+                FirstName = faculty.FirstName,
+                LastName = faculty.LastName,
+                DateOfBirth = faculty.DateOfBirth,
+                Email = faculty.Email,
+                Phone = faculty.Phone,
+                Address = faculty.Address,
+                Department = faculty.Department,
+                Title = faculty.Title
+            };
+
+            return new FacultyManageViewModel
+            {
+                Profile = profileVm,
+                Password = passwordInput ?? new FacultyChangePasswordViewModel()
+            };
         }
     }
 }
