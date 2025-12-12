@@ -1,7 +1,10 @@
 @model IEnumerable<SIMS.Models.Notification>
 @{
     ViewData["Title"] = "Notifications";
-    var vnTz = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"); // UTC+7
+    var vnTzId = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows)
+        ? "SE Asia Standard Time"
+        : "Asia/Ho_Chi_Minh";
+    var vnTz = TimeZoneInfo.FindSystemTimeZoneById(vnTzId); // UTC+7
 }
 <h1 class="mb-3">Notifications</h1>
 <div class="list-group">

@@ -20,7 +20,7 @@ public class Student
     [Required, EmailAddress]
     public string Email { get; set; } = string.Empty;
 
-    [Phone]
+    [StringLength(25)]
     public string? Phone { get; set; }
 
     [StringLength(200)]
