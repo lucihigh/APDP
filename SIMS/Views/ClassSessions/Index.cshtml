@@ -1,6 +1,26 @@
 @model IEnumerable<SIMS.Models.ClassSession>
 @{
     ViewData["Title"] = "Sessions";
+    string DayLabel(int d) => d switch
+    {
+        1 => "Thứ 2",
+        2 => "Thứ 3",
+        3 => "Thứ 4",
+        4 => "Thứ 5",
+        5 => "Thứ 6",
+        6 => "Thứ 7",
+        _ => "Chủ nhật"
+    };
+    string SlotRange(int slot) => slot switch
+    {
+        1 => "07:00 - 09:00",
+        2 => "09:00 - 11:00",
+        3 => "12:00 - 14:00",
+        4 => "14:00 - 16:00",
+        5 => "16:00 - 18:00",
+        6 => "18:00 - 20:00",
+        _ => ""
+    };
 }
 
 <div class="page-header mb-3">
@@ -21,6 +41,7 @@
                 <thead>
                     <tr>
                         <th>Day</th>
+                        <th>Slot</th>
                         <th>Start</th>
                         <th>End</th>
                         <th>Location</th>
@@ -32,9 +53,13 @@
                 @foreach (var item in Model)
                 {
                     <tr>
-                        <td>@item.DayOfWeek</td>
-                        <td>@item.StartTime</td>
-                        <td>@item.EndTime</td>
+                        <td>@DayLabel(item.DayOfWeek)</td>
+                        <td>
+                            <span class="fw-semibold">Ca @item.SessionSlot</span>
+                            <div class="small text-secondary">@SlotRange(item.SessionSlot)</div>
+                        </td>
+                        <td>@item.StartTime.ToString("yyyy-MM-dd")</td>
+                        <td>@item.EndTime.ToString("yyyy-MM-dd")</td>
                         <td>@item.Location</td>
                         <td>@item.Course?.Code</td>
                         <td class="text-end">

@@ -21,14 +21,19 @@
                         <select asp-for="CourseId" class="form-select" asp-items="ViewBag.CourseId"></select>
                     </div>
                     <div class="col-md-6">
-                        <label asp-for="DayOfWeek" class="form-label">Day of week (0-6)</label>
-                        <input asp-for="DayOfWeek" class="form-control" type="number" min="0" max="6" />
+                        <label asp-for="DayOfWeek" class="form-label">Day</label>
+                        <select asp-for="DayOfWeek" class="form-select" asp-items="ViewBag.DayOfWeek"></select>
                         <span asp-validation-for="DayOfWeek" class="text-danger"></span>
                     </div>
                     <div class="col-md-6">
                         <label asp-for="Location" class="form-label"></label>
                         <input asp-for="Location" class="form-control" placeholder="Online / Room A1 / ..." />
                         <span asp-validation-for="Location" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="SessionSlot" class="form-label">Session slot</label>
+                        <select asp-for="SessionSlot" class="form-select" asp-items="ViewBag.SessionSlot"></select>
+                        <span asp-validation-for="SessionSlot" class="text-danger"></span>
                     </div>
                     <div class="col-md-6">
                         <label asp-for="StartTime" class="form-label">Start date</label>
@@ -52,4 +57,3 @@
         </div>
     </div>
 </div>
-

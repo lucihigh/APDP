@@ -50,6 +50,12 @@ namespace SIMS.Controllers
                     s.Email.Contains(term) ||
                     (s.Program != null && s.Program.Contains(term)));
             }
+
+            // Sort by "name" A-Z (Vietnamese convention: given name is often stored in LastName)
+            query = query
+                .OrderBy(s => s.LastName)
+                .ThenBy(s => s.FirstName)
+                .ThenBy(s => s.Email);
             ViewData["q"] = q;
             return View(await query.ToListAsync());
         }
@@ -391,14 +397,60 @@ namespace SIMS.Controllers
         public async Task<IActionResult> MyTimetable()
         {
             var user = await _userManager.GetUserAsync(User);
-            var sessions = await _context.ClassSessions
-                .Include(cs => cs.Course)
-                .Where(cs => _context.Enrollments
-                    .Include(e => e.Student)
-                    .Any(e => e.CourseId == cs.CourseId && e.Student!.UserId == user!.Id))
-                .OrderBy(cs => cs.DayOfWeek).ThenBy(cs => cs.StartTime)
+            if (user == null) return Challenge();
+
+            var courseIds = await _context.Enrollments
+                .Include(e => e.Student)
+                .Where(e => e.Student!.UserId == user.Id)
+                .Select(e => e.CourseId)
+                .Distinct()
                 .ToListAsync();
-            return View(sessions);
+
+            var courses = await _context.Courses
+                .AsNoTracking()
+                .Where(c => courseIds.Contains(c.Id))
+                .OrderBy(c => c.Code)
+                .ToListAsync();
+
+            var sessions = await _context.ClassSessions
+                .AsNoTracking()
+                .Where(cs => courseIds.Contains(cs.CourseId))
+                .Include(cs => cs.Course)
+                .ToListAsync();
+
+            var sessionsByCourse = sessions
+                .GroupBy(s => s.CourseId)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            var vm = new StudentTimetableViewModel
+            {
+                Courses = courses.Select(c =>
+                {
+                    sessionsByCourse.TryGetValue(c.Id, out var courseSessions);
+                    var ordered = (courseSessions ?? new List<ClassSession>())
+                        .OrderBy(s => s.DayOfWeek == 0 ? 7 : s.DayOfWeek)
+                        .ThenBy(s => s.SessionSlot)
+                        .ThenBy(s => s.StartTime)
+                        .ToList();
+
+                    return new StudentTimetableCourseViewModel
+                    {
+                        CourseId = c.Id,
+                        Code = c.Code,
+                        Name = c.Name,
+                        Sessions = ordered.Select(s => new StudentTimetableSessionViewModel
+                        {
+                            DayOfWeek = s.DayOfWeek,
+                            SessionSlot = s.SessionSlot,
+                            StartDate = s.StartTime,
+                            EndDate = s.EndTime,
+                            Location = s.Location
+                        }).ToList()
+                    };
+                }).ToList()
+            };
+
+            return View(vm);
         }
     }
 }

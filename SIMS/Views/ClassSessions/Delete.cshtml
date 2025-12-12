@@ -2,6 +2,26 @@
 
 @{
     ViewData["Title"] = "Delete session";
+    string DayLabel(int d) => d switch
+    {
+        1 => "Thứ 2",
+        2 => "Thứ 3",
+        3 => "Thứ 4",
+        4 => "Thứ 5",
+        5 => "Thứ 6",
+        6 => "Thứ 7",
+        _ => "Chủ nhật"
+    };
+    string SlotRange(int slot) => slot switch
+    {
+        1 => "07:00 - 09:00",
+        2 => "09:00 - 11:00",
+        3 => "12:00 - 14:00",
+        4 => "14:00 - 16:00",
+        5 => "16:00 - 18:00",
+        6 => "18:00 - 20:00",
+        _ => ""
+    };
 }
 
 <div class="page-header mb-3">
@@ -21,16 +41,16 @@
                 <div class="text-secondary small">Session ID: @Model.Id</div>
             </div>
             <span class="badge bg-danger-subtle text-danger px-3 py-2">
-                Day @Model.DayOfWeek
+                @DayLabel(Model.DayOfWeek) • Ca @Model.SessionSlot (@SlotRange(Model.SessionSlot))
             </span>
         </div>
 
         <dl class="row g-3 mb-0">
-            <dt class="col-sm-3 text-secondary">@Html.DisplayNameFor(model => model.StartTime)</dt>
-            <dd class="col-sm-9 fw-semibold">@Html.DisplayFor(model => model.StartTime)</dd>
+            <dt class="col-sm-3 text-secondary">Start date</dt>
+            <dd class="col-sm-9 fw-semibold">@Model.StartTime.ToString("yyyy-MM-dd")</dd>
 
-            <dt class="col-sm-3 text-secondary">@Html.DisplayNameFor(model => model.EndTime)</dt>
-            <dd class="col-sm-9 fw-semibold">@Html.DisplayFor(model => model.EndTime)</dd>
+            <dt class="col-sm-3 text-secondary">End date</dt>
+            <dd class="col-sm-9 fw-semibold">@Model.EndTime.ToString("yyyy-MM-dd")</dd>
 
             <dt class="col-sm-3 text-secondary">@Html.DisplayNameFor(model => model.Location)</dt>
             <dd class="col-sm-9 fw-semibold">@Html.DisplayFor(model => model.Location)</dd>

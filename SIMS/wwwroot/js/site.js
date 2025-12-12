@@ -5,6 +5,22 @@
 (function () {
   const mainSelector = '#main';
 
+  function closeMobileNavbar() {
+    const collapseEl = document.querySelector('.navbar-collapse.show');
+    if (!collapseEl) return;
+
+    try {
+      if (window.bootstrap && window.bootstrap.Collapse) {
+        window.bootstrap.Collapse.getOrCreateInstance(collapseEl, { toggle: false }).hide();
+        return;
+      }
+    } catch (e) {
+      // fall back below
+    }
+
+    collapseEl.classList.remove('show');
+  }
+
   function updateActiveNav() {
     const nav = document.querySelector('[data-app-nav]');
     if (!nav) return;
@@ -170,10 +186,21 @@
     if (anchor.hasAttribute('download')) return;
 
     e.preventDefault();
+
+    // Close navbar on mobile after selecting a link
+    if (anchor.closest('.navbar')) {
+      closeMobileNavbar();
+    }
     navigate(url, true);
   }
 
   window.addEventListener('click', onClick);
+  window.addEventListener('submit', function (e) {
+    // Close navbar when submitting forms in the navbar (e.g. Logout)
+    if (e.target && e.target.closest && e.target.closest('.navbar')) {
+      closeMobileNavbar();
+    }
+  }, true);
   window.addEventListener('popstate', function (e) {
     const url = (e.state && e.state.url) || window.location.href;
     navigate(url, false);

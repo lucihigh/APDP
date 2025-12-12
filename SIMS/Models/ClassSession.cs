@@ -13,6 +13,9 @@ public class ClassSession
     [Range(0,6)]
     public int DayOfWeek { get; set; } // 0=Sunday ... 6=Saturday
 
+    [Range(1, 6)]
+    public int SessionSlot { get; set; } = 1; // Ca 1..6
+
     [DataType(DataType.Date)]
     public DateOnly StartTime { get; set; }
     [DataType(DataType.Date)]

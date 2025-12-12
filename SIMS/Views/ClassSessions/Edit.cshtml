@@ -1,51 +1,67 @@
 @model SIMS.Models.ClassSession
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Session";
 }
 
-<h1>Edit</h1>
-
-<h4>ClassSession</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="CourseId" class="control-label"></label>
-                <select asp-for="CourseId" class="form-control" asp-items="ViewBag.CourseId"></select>
-                <span asp-validation-for="CourseId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DayOfWeek" class="control-label"></label>
-                <input asp-for="DayOfWeek" class="form-control" />
-                <span asp-validation-for="DayOfWeek" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StartTime" class="control-label"></label>
-                <input asp-for="StartTime" class="form-control" />
-                <span asp-validation-for="StartTime" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="EndTime" class="control-label"></label>
-                <input asp-for="EndTime" class="form-control" />
-                <span asp-validation-for="EndTime" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Location" class="control-label"></label>
-                <input asp-for="Location" class="form-control" />
-                <span asp-validation-for="Location" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
+<div class="page-header mb-3">
+    <div class="page-header-title">Edit session</div>
+    <div class="page-header-subtitle">Update meeting day, slot, dates, and room for a course.</div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+<div class="row justify-content-center">
+    <div class="col-lg-7 col-xl-6">
+        <div class="card shadow-sm form-card">
+            <div class="card-body">
+                <form asp-action="Edit" class="row g-3">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="col-12">
+                        <label asp-for="CourseId" class="form-label">Course</label>
+                        <select asp-for="CourseId" class="form-select" asp-items="ViewBag.CourseId"></select>
+                        <span asp-validation-for="CourseId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="DayOfWeek" class="form-label">Day</label>
+                        <select asp-for="DayOfWeek" class="form-select" asp-items="ViewBag.DayOfWeek"></select>
+                        <span asp-validation-for="DayOfWeek" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="SessionSlot" class="form-label">Session slot</label>
+                        <select asp-for="SessionSlot" class="form-select" asp-items="ViewBag.SessionSlot"></select>
+                        <span asp-validation-for="SessionSlot" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="StartTime" class="form-label">Start date</label>
+                        <input asp-for="StartTime" class="form-control" type="date" />
+                        <span asp-validation-for="StartTime" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="EndTime" class="form-label">End date</label>
+                        <input asp-for="EndTime" class="form-control" type="date" />
+                        <span asp-validation-for="EndTime" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="Location" class="form-label"></label>
+                        <input asp-for="Location" class="form-control" placeholder="Online / Room A1 / ..." />
+                        <span asp-validation-for="Location" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12 d-flex justify-content-between align-items-center mt-2">
+                        <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check2 me-1"></i>Save changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
