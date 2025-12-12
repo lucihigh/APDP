@@ -8,13 +8,13 @@ public class StudentTimetableViewModel
 
     public static IReadOnlyList<StudentTimetableDayViewModel> Days { get; } = new List<StudentTimetableDayViewModel>
     {
-        new(1, "Thứ 2"),
-        new(2, "Thứ 3"),
-        new(3, "Thứ 4"),
-        new(4, "Thứ 5"),
-        new(5, "Thứ 6"),
-        new(6, "Thứ 7"),
-        new(0, "Chủ nhật")
+        new(1, "Monday"),
+        new(2, "Tuesday"),
+        new(3, "Wednesday"),
+        new(4, "Thursday"),
+        new(5, "Friday"),
+        new(6, "Saturday"),
+        new(0, "Sunday")
     };
 
     public static IReadOnlyList<StudentTimetableSlotViewModel> Slots { get; } = new List<StudentTimetableSlotViewModel>
@@ -32,7 +32,7 @@ public record StudentTimetableDayViewModel(int Value, string Label);
 
 public record StudentTimetableSlotViewModel(int Slot, string Start, string End)
 {
-    public string Label => $"Ca {Slot}";
+    public string Label => $"Slot {Slot}";
     public string TimeRange => $"{Start} - {End}";
 }
 
@@ -52,4 +52,3 @@ public class StudentTimetableSessionViewModel
     public DateOnly EndDate { get; set; }
     public string? Location { get; set; }
 }
-

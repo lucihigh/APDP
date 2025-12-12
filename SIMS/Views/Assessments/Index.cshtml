@@ -33,7 +33,7 @@
                         <tr>
                             <td class="fw-semibold">@item.Title</td>
                             <td class="text-muted">@item.Description</td>
-                            <td>@(item.DueDate?.ToString("yyyy-MM-dd") ?? "—")</td>
+                            <td>@(item.DueDate?.ToString("yyyy-MM-dd") ?? "-")</td>
                             <td class="text-muted">@item.AttachmentPath</td>
                             <td>@item.Course?.Code</td>
                             <td class="text-end">

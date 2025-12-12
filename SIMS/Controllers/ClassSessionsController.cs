@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SIMS.Data;
 using SIMS.Models;
-using Microsoft.AspNetCore.Authorization;
 
 namespace SIMS.Controllers
 {
@@ -198,13 +198,13 @@ namespace SIMS.Controllers
         {
             return new[]
             {
-                new { Value = 1, Text = "Thứ 2" },
-                new { Value = 2, Text = "Thứ 3" },
-                new { Value = 3, Text = "Thứ 4" },
-                new { Value = 4, Text = "Thứ 5" },
-                new { Value = 5, Text = "Thứ 6" },
-                new { Value = 6, Text = "Thứ 7" },
-                new { Value = 0, Text = "Chủ nhật" }
+                new { Value = 1, Text = "Monday" },
+                new { Value = 2, Text = "Tuesday" },
+                new { Value = 3, Text = "Wednesday" },
+                new { Value = 4, Text = "Thursday" },
+                new { Value = 5, Text = "Friday" },
+                new { Value = 6, Text = "Saturday" },
+                new { Value = 0, Text = "Sunday" }
             };
         }
 
@@ -212,12 +212,12 @@ namespace SIMS.Controllers
         {
             return new[]
             {
-                new { Value = 1, Text = "Ca 1 (07:00 - 09:00)" },
-                new { Value = 2, Text = "Ca 2 (09:00 - 11:00)" },
-                new { Value = 3, Text = "Ca 3 (12:00 - 14:00)" },
-                new { Value = 4, Text = "Ca 4 (14:00 - 16:00)" },
-                new { Value = 5, Text = "Ca 5 (16:00 - 18:00)" },
-                new { Value = 6, Text = "Ca 6 (18:00 - 20:00)" }
+                new { Value = 1, Text = "Slot 1 (07:00 - 09:00)" },
+                new { Value = 2, Text = "Slot 2 (09:00 - 11:00)" },
+                new { Value = 3, Text = "Slot 3 (12:00 - 14:00)" },
+                new { Value = 4, Text = "Slot 4 (14:00 - 16:00)" },
+                new { Value = 5, Text = "Slot 5 (16:00 - 18:00)" },
+                new { Value = 6, Text = "Slot 6 (18:00 - 20:00)" }
             };
         }
     }

@@ -106,7 +106,9 @@ namespace SIMS.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-            returnUrl ??= Url.Content("~/");
+            var homeUrl = Url.Content("~/");
+            // Always redirect to Home after login to avoid returning to unauthorized pages (ReturnUrl).
+            returnUrl = homeUrl;
 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
@@ -134,11 +136,11 @@ namespace SIMS.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
-                    return LocalRedirect(returnUrl);
+                    return LocalRedirect(homeUrl);
                 }
                 if (result.RequiresTwoFactor)
                 {
-                    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
+                    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = homeUrl, RememberMe = Input.RememberMe });
                 }
                 if (result.IsLockedOut)
                 {

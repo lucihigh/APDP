@@ -8,14 +8,14 @@
 <div class="page-header d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
     <div>
         <div class="page-header-title">My Timetable</div>
-        <div class="page-header-subtitle">Chọn môn học để xem lịch học theo tuần (Thứ 2 - Chủ nhật).</div>
+        <div class="page-header-subtitle">Select a course to view your weekly schedule (Monday - Sunday).</div>
     </div>
 </div>
 
 @if (Model.Courses.Count == 0)
 {
     <div class="alert alert-info mb-0">
-        Chưa có môn học nào trong thời khóa biểu của bạn.
+        You don't have any courses in your timetable yet.
     </div>
 }
 else
@@ -37,7 +37,7 @@ else
                                 <span class="text-primary">@course.Code</span> - @course.Name
                             </div>
                             <div class="small text-secondary">
-                                @(course.Sessions.Count == 0 ? "Chưa có lịch học" : $"{course.Sessions.Count} buổi/tuần")
+                                @(course.Sessions.Count == 0 ? "No scheduled sessions" : $"{course.Sessions.Count} session(s)/week")
                             </div>
                         </div>
                     </button>
@@ -47,7 +47,7 @@ else
                         @if (course.Sessions.Count == 0)
                         {
                             <div class="alert alert-secondary mb-0">
-                                Môn học này chưa được xếp lịch. Vui lòng quay lại sau.
+                                This course is not scheduled yet. Please check back later.
                             </div>
                         }
                         else
@@ -56,7 +56,7 @@ else
                                 <table class="table table-sm align-middle mb-0 timetable-grid">
                                     <thead>
                                         <tr>
-                                            <th class="timetable-slot-col">Ca</th>
+                                            <th class="timetable-slot-col">Slot</th>
                                             @foreach (var d in days)
                                             {
                                                 <th class="text-center">@d.Label</th>
@@ -87,16 +87,16 @@ else
                                                                     <div class="small text-secondary">
                                                                         @if (!string.IsNullOrWhiteSpace(s.Location))
                                                                         {
-                                                                            <span>@s.Location</span><span class="mx-1">•</span>
+                                                                            <span>@s.Location</span><span class="mx-1">|</span>
                                                                         }
-                                                                        <span>@s.StartDate.ToString("yyyy-MM-dd") → @s.EndDate.ToString("yyyy-MM-dd")</span>
+                                                                        <span>@s.StartDate.ToString("yyyy-MM-dd") to @s.EndDate.ToString("yyyy-MM-dd")</span>
                                                                     </div>
                                                                 </div>
                                                             }
                                                         }
                                                         else
                                                         {
-                                                            <span class="text-secondary small">—</span>
+                                                            <span class="text-secondary small">-</span>
                                                         }
                                                     </td>
                                                 }
@@ -106,7 +106,7 @@ else
                                 </table>
                             </div>
                             <div class="mt-3 small text-secondary">
-                                Gợi ý: Cuộn ngang trên điện thoại để xem đủ các ngày.
+                                Tip: On mobile, swipe horizontally to see all days.
                             </div>
                         }
                     </div>
