@@ -6,14 +6,17 @@ namespace SIMS.Data;
 
 public static class SeedData
 {
-    public static async Task InitializeAsync(IServiceProvider services)
+    public static async Task InitializeAsync(IServiceProvider services, bool applyMigrations = true)
     {
         using var scope = services.CreateScope();
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-        await db.Database.MigrateAsync();
+        if (applyMigrations)
+        {
+            await db.Database.MigrateAsync();
+        }
 
         // Remove orphaned user-role links to avoid FK violations when roles/users are recreated
         var existingUserIds = new HashSet<string>(await db.Users.Select(u => u.Id).ToListAsync(), StringComparer.OrdinalIgnoreCase);

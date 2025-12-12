@@ -158,7 +158,9 @@ using (var scope = app.Services.CreateScope())
 
     if (!string.Equals(app.Environment.EnvironmentName, "IntegrationTesting", StringComparison.OrdinalIgnoreCase))
     {
-        await SIMS.Data.SeedData.InitializeAsync(services);
+        // Skip migrations inside seeding when we're already in a fallback/ensure-created mode to avoid migration lock loops
+        var applyMigrationsInSeed = !usingSqliteFallback;
+        await SIMS.Data.SeedData.InitializeAsync(services, applyMigrationsInSeed);
     }
     else
     {
