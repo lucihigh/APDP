@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace SIMS.Migrations
+namespace SIMS.Data.MigrationsPostgres
 {
     /// <inheritdoc />
     public partial class AddSessionSlotToClassSessions : Migration
@@ -13,11 +13,10 @@ namespace SIMS.Migrations
             migrationBuilder.AddColumn<int>(
                 name: "SessionSlot",
                 table: "ClassSessions",
-                type: "INTEGER",
+                type: "integer",
                 nullable: false,
                 defaultValue: 1);
 
-            // Backfill in case some providers keep default as 0 for existing rows
             migrationBuilder.Sql("UPDATE \"ClassSessions\" SET \"SessionSlot\" = 1 WHERE \"SessionSlot\" = 0;");
         }
 
