@@ -22,10 +22,7 @@
 </div>
 <form method="get" class="row g-2 mb-3" role="search" aria-label="Search courses">
     <div class="col-auto">
-        <input class="form-control" type="search" name="q" value="@((string?)ViewData["q"])" placeholder="Search code, name, department" />
-    </div>
-    <div class="col-auto">
-        <button class="btn btn-outline-secondary" type="submit">Search</button>
+        <input class="form-control" type="search" name="q" value="@((string?)ViewData["q"])" placeholder="Search code, name, department" data-course-search />
     </div>
 </form>
 <div class="card shadow-sm">
@@ -51,7 +48,8 @@
     </thead>
     <tbody>
 @foreach (var item in Model) {
-        <tr>
+    var searchText = string.Join(" ", new[] { item.Code, item.Name, item.Department, item.Credits.ToString() }).ToLowerInvariant();
+        <tr data-course-row data-search="@searchText">
             <td>
                 @Html.DisplayFor(modelItem => item.Code)
             </td>
@@ -82,10 +80,12 @@
             </td>
         </tr>
 }
+        <tr data-course-empty style="display:none;">
+            <td colspan="5" class="text-center text-secondary">No courses match your search.</td>
+        </tr>
     </tbody>
 </table>
 </div>
     </div>
 </div>
-
 

@@ -110,8 +110,36 @@
     filter();
   }
 
+  function initCourseFilter(root) {
+    const input = root.querySelector('[data-course-search]');
+    const rows = Array.from(root.querySelectorAll('[data-course-row]'));
+    const empty = root.querySelector('[data-course-empty]');
+    if (!input || rows.length === 0) return;
+    if (input.dataset.bound === '1') return;
+    input.dataset.bound = '1';
+
+    const filter = () => {
+      const term = (input.value || '').trim().toLowerCase();
+      let visible = 0;
+      rows.forEach(row => {
+        const haystack = row.dataset.search || '';
+        const match = term === '' || haystack.includes(term);
+        row.style.display = match ? '' : 'none';
+        if (match) visible++;
+      });
+      if (empty) empty.style.display = visible === 0 ? '' : 'none';
+    };
+
+    const form = input.closest('form');
+    if (form) form.addEventListener('submit', e => e.preventDefault());
+
+    input.addEventListener('input', filter);
+    filter();
+  }
+
   function initPageScripts(root = document) {
     initClassListFilter(root);
+    initCourseFilter(root);
   }
 
   function onClick(e) {
