@@ -33,14 +33,12 @@
                         {
                             <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Students" asp-action="Index">Students</a></li>
                             <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Courses" asp-action="Index">Courses</a></li>
-                            <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Enrollments" asp-action="Index">Enrollments</a></li>
                             <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Assessments" asp-action="Index">Assessments</a></li>
                             <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="ClassSessions" asp-action="Index">Sessions</a></li>
                         }
                         else if (User.IsInRole("Faculty"))
                         {
                             <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Courses" asp-action="Index">Courses</a></li>
-                            <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Enrollments" asp-action="Index">Enrollments</a></li>
                             <li class="nav-item"><a class="nav-link" data-app-link="true" asp-area="" asp-controller="Reports" asp-action="Index">Reports</a></li>
                         }
                         else if (User.IsInRole("Student"))
@@ -83,5 +81,4 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
-
 

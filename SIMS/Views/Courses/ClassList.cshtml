@@ -1,18 +1,62 @@
-@model IEnumerable<SIMS.Models.Student>
+@model IEnumerable<SIMS.Models.Enrollment>
 @{
     ViewData["Title"] = "Class List";
     var course = (SIMS.Models.Course)ViewData["Course"]!;
 }
-<h1>Class List - @course.Code @course.Name</h1>
-<table class="table table-striped table-hover align-middle">
-    <thead><tr><th>Name</th><th>Email</th><th>Program</th><th>Year</th></tr></thead>
-    <tbody>
-    @foreach (var s in Model)
-    {
-        <tr>
-            <td>@s.FullName</td><td>@s.Email</td><td>@s.Program</td><td>@s.Year</td>
-        </tr>
-    }
-    </tbody>
-</table>
+<div class="page-header mb-3">
+    <div class="page-header-title">Class List - @course.Code @course.Name</div>
+    <div class="page-header-subtitle">Grade from the class roster and track who has submitted.</div>
+</div>
 
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Program</th>
+                        <th>Year</th>
+                        <th>Status</th>
+                        <th>Grade</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var enrollment in Model)
+                {
+                    var student = enrollment.Student;
+                    var hasSubmission = !string.IsNullOrWhiteSpace(enrollment.Grade);
+                    <tr>
+                        <td>@student?.FullName</td>
+                        <td>@student?.Email</td>
+                        <td>@student?.Program</td>
+                        <td>@student?.Year</td>
+                        <td>
+                            @if (hasSubmission)
+                            {
+                                <span class="badge bg-success-subtle text-success">Submitted</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary-subtle text-secondary">Not submitted</span>
+                            }
+                        </td>
+                        <td class="fw-semibold">
+                            @(string.IsNullOrWhiteSpace(enrollment.Grade) ? "—" : enrollment.Grade)
+                        </td>
+                        <td class="text-end table-actions">
+                            <div class="d-inline-flex gap-2 action-group">
+                                <a class="btn btn-sm btn-outline-primary" asp-controller="Enrollments" asp-action="Grade" asp-route-id="@enrollment.Id">
+                                    <i class="bi bi-journal-check me-1"></i>Grade
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

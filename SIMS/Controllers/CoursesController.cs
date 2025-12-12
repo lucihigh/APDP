@@ -61,13 +61,13 @@ namespace SIMS.Controllers
             if (id == null) return NotFound();
             var course = await _context.Courses.FirstOrDefaultAsync(c => c.Id == id);
             if (course == null) return NotFound();
-            var students = await _context.Enrollments
+            var enrollments = await _context.Enrollments
                 .Where(e => e.CourseId == id)
                 .Include(e => e.Student)
-                .Select(e => e.Student!)
+                .AsNoTracking()
                 .ToListAsync();
             ViewData["Course"] = course;
-            return View(students);
+            return View(enrollments);
         }
 
         // GET: Courses/Create
