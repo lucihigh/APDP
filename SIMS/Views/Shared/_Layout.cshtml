@@ -68,7 +68,7 @@
         </nav>
     </header>
     <div class="container-fluid px-4 flex-grow-1">
-        <main id="main" role="main" class="pb-3 flex-grow-1 page-shell">
+        <main id="main" role="main" class="flex-grow-1 page-shell">
             <partial name="_Alerts" />
             @RenderBody()
         </main>
@@ -83,6 +83,5 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
-
 
 

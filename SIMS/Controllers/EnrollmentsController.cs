@@ -10,10 +10,12 @@ using SIMS.Models;
 using Microsoft.AspNetCore.Authorization;
 using SIMS.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Net.Http.Headers;
 
 namespace SIMS.Controllers
 {
     [Authorize(Roles = "Admin,Faculty")]
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public class EnrollmentsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -28,8 +30,10 @@ namespace SIMS.Controllers
         }
 
         // GET: Enrollments
+        [ResponseCache(NoStore = true, Duration = 0, Location = ResponseCacheLocation.None)]
         public async Task<IActionResult> Index(string? courseCode, string? semester, string? student)
         {
+            SetNoCache(Response);
             var query = _context.Enrollments
                 .AsNoTracking()
                 .Include(e => e.Course)
@@ -276,6 +280,7 @@ namespace SIMS.Controllers
                 return NotFound();
             }
 
+            SetNoCache(Response);
             var enrollment = await _context.Enrollments
                 .Include(e => e.Student)
                 .Include(e => e.Course)
@@ -293,6 +298,7 @@ namespace SIMS.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Grade(int id, [Bind("Id,Grade")] Enrollment input)
         {
+            SetNoCache(Response);
             var enrollment = await _context.Enrollments
                 .Include(e => e.Student)
                 .Include(e => e.Course)
@@ -310,6 +316,8 @@ namespace SIMS.Controllers
             enrollment.Grade = input.Grade;
             _context.Update(enrollment);
             await _context.SaveChangesAsync();
+            // Ensure the latest grade is persisted before rendering next view
+            await _context.Entry(enrollment).ReloadAsync();
 
             if (enrollment.Student?.UserId != null && !string.IsNullOrWhiteSpace(enrollment.Grade))
             {
@@ -317,7 +325,8 @@ namespace SIMS.Controllers
             }
 
             TempData["Success"] = "Grade saved successfully.";
-            return RedirectToAction(nameof(Index));
+            // Add a cache-busting token to avoid stale page responses
+            return RedirectToAction(nameof(Index), new { t = Guid.NewGuid().ToString("N") });
         }
 
         // GET: Enrollments/Delete/5
@@ -385,6 +394,13 @@ namespace SIMS.Controllers
                     Text = $"{s.FirstName} {s.LastName} ({s.Email})"
                 })
                 .ToListAsync();
+        }
+
+        private static void SetNoCache(HttpResponse response)
+        {
+            response.Headers[HeaderNames.CacheControl] = "no-store, no-cache, must-revalidate, max-age=0";
+            response.Headers[HeaderNames.Pragma] = "no-cache";
+            response.Headers[HeaderNames.Expires] = "0";
         }
     }
 }

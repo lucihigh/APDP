@@ -373,8 +373,12 @@ namespace SIMS.Controllers
         }
 
         [Authorize(Roles = "Student")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> MyGrades()
         {
+            Response.Headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "0";
             var user = await _userManager.GetUserAsync(User);
             var items = await _context.Enrollments
                 .Include(e => e.Course)
