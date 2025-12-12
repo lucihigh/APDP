@@ -55,6 +55,7 @@ namespace SIMS.Controllers
         }
 
         // GET: Enrollments/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Code");
@@ -62,11 +63,94 @@ namespace SIMS.Controllers
             return View();
         }
 
+        // GET: Enrollments/BulkCreate
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> BulkCreate()
+        {
+            var vm = new EnrollmentBulkCreateViewModel
+            {
+                Courses = await BuildCourseSelectListAsync(),
+                Students = await BuildStudentSelectListAsync()
+            };
+            return View(vm);
+        }
+
+        // POST: Enrollments/BulkCreate
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> BulkCreate(EnrollmentBulkCreateViewModel model)
+        {
+            if (model.StudentIds == null || !model.StudentIds.Any())
+            {
+                ModelState.AddModelError(nameof(model.StudentIds), "Select at least one student");
+            }
+
+            var distinctStudentIds = model.StudentIds?.Distinct().ToList() ?? new List<int>();
+            var validStudentIds = await _context.Students
+                .Where(s => distinctStudentIds.Contains(s.Id))
+                .Select(s => s.Id)
+                .ToListAsync();
+
+            if (distinctStudentIds.Any() && validStudentIds.Count != distinctStudentIds.Count)
+            {
+                ModelState.AddModelError(nameof(model.StudentIds), "One or more selected students were not found.");
+            }
+
+            if (!await _context.Courses.AnyAsync(c => c.Id == model.CourseId))
+            {
+                ModelState.AddModelError(nameof(model.CourseId), "Course not found.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                model.Courses = await BuildCourseSelectListAsync();
+                model.Students = await BuildStudentSelectListAsync();
+                return View(model);
+            }
+
+            var existingStudentIds = new HashSet<int>(await _context.Enrollments
+                .Where(e => e.CourseId == model.CourseId && validStudentIds.Contains(e.StudentId))
+                .Select(e => e.StudentId)
+                .ToListAsync());
+
+            var newEnrollments = validStudentIds
+                .Where(id => !existingStudentIds.Contains(id))
+                .Select(id => new Enrollment
+                {
+                    StudentId = id,
+                    CourseId = model.CourseId,
+                    Semester = model.Semester,
+                    Grade = model.Grade
+                })
+                .ToList();
+
+            if (newEnrollments.Any())
+            {
+                _context.Enrollments.AddRange(newEnrollments);
+                await _context.SaveChangesAsync();
+                TempData["Success"] = $"Created {newEnrollments.Count} enrollment(s).";
+            }
+
+            var skipped = validStudentIds.Count - newEnrollments.Count;
+            if (skipped > 0)
+            {
+                TempData["Info"] = $"Skipped {skipped} already-enrolled student(s).";
+            }
+            else if (!newEnrollments.Any())
+            {
+                TempData["Info"] = "All selected students are already enrolled in this course.";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
         // POST: Enrollments/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("Id,StudentId,CourseId,Semester,Grade")] Enrollment enrollment)
         {
             if (ModelState.IsValid)
@@ -81,6 +165,7 @@ namespace SIMS.Controllers
         }
 
         // GET: Enrollments/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -103,6 +188,7 @@ namespace SIMS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,StudentId,CourseId,Semester,Grade")] Enrollment enrollment)
         {
             if (id != enrollment.Id)
@@ -142,6 +228,7 @@ namespace SIMS.Controllers
         }
 
         // GET: Enrollments/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -164,6 +251,7 @@ namespace SIMS.Controllers
         // POST: Enrollments/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var enrollment = await _context.Enrollments.FindAsync(id);
@@ -179,6 +267,31 @@ namespace SIMS.Controllers
         private bool EnrollmentExists(int id)
         {
             return _context.Enrollments.Any(e => e.Id == id);
+        }
+
+        private async Task<List<SelectListItem>> BuildCourseSelectListAsync()
+        {
+            return await _context.Courses
+                .OrderBy(c => c.Code)
+                .Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = $"{c.Code} - {c.Name}"
+                })
+                .ToListAsync();
+        }
+
+        private async Task<List<SelectListItem>> BuildStudentSelectListAsync()
+        {
+            return await _context.Students
+                .OrderBy(s => s.LastName)
+                .ThenBy(s => s.FirstName)
+                .Select(s => new SelectListItem
+                {
+                    Value = s.Id.ToString(),
+                    Text = $"{s.FirstName} {s.LastName} ({s.Email})"
+                })
+                .ToListAsync();
         }
     }
 }

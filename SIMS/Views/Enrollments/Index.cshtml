@@ -10,7 +10,11 @@
         <div class="page-header-subtitle">Track students registered in each course and semester.</div>
     </div>
     <div class="d-flex gap-2">
-        <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-lg me-1"></i> New enrollment</a>
+        @if (User.IsInRole("Admin"))
+        {
+            <a class="btn btn-outline-success" asp-action="BulkCreate"><i class="bi bi-people-fill me-1"></i> Bulk enroll</a>
+            <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-lg me-1"></i> New enrollment</a>
+        }
     </div>
 </div>
 <div class="card shadow-sm">
@@ -54,12 +58,15 @@
                     <a class="btn btn-sm btn-outline-info" asp-action="Details" asp-route-id="@item.Id">
                         <i class="bi bi-info-circle me-1"></i>Details
                     </a>
-                    <a class="btn btn-sm btn-outline-success" asp-action="Edit" asp-route-id="@item.Id">
-                        <i class="bi bi-pencil-square me-1"></i>Edit
-                    </a>
-                    <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@item.Id">
-                        <i class="bi bi-trash me-1"></i>Delete
-                    </a>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a class="btn btn-sm btn-outline-success" asp-action="Edit" asp-route-id="@item.Id">
+                            <i class="bi bi-pencil-square me-1"></i>Edit
+                        </a>
+                        <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@item.Id">
+                            <i class="bi bi-trash me-1"></i>Delete
+                        </a>
+                    }
                 </div>
             </td>
         </tr>

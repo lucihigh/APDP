@@ -1,0 +1,55 @@
+@model SIMS.Models.EnrollmentBulkCreateViewModel
+
+@{
+    ViewData["Title"] = "Bulk Enroll";
+}
+
+<div class="page-header d-flex flex-wrap align-items-center justify-content-between gap-2">
+    <div>
+        <div class="page-header-title">Bulk Enroll Students</div>
+        <div class="page-header-subtitle">Assign a course to multiple students in one action.</div>
+    </div>
+    <a class="btn btn-outline-secondary" asp-action="Index"><i class="bi bi-arrow-left"></i> Back to list</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form asp-action="BulkCreate" method="post" class="row g-3">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="col-md-6">
+                <label asp-for="CourseId" class="form-label"></label>
+                <select asp-for="CourseId" class="form-select" asp-items="Model.Courses"></select>
+                <span asp-validation-for="CourseId" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Semester" class="form-label"></label>
+                <input asp-for="Semester" class="form-control" placeholder="e.g. Fall 2025" />
+                <span asp-validation-for="Semester" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Grade" class="form-label"></label>
+                <input asp-for="Grade" class="form-control" placeholder="Optional initial grade" />
+                <span asp-validation-for="Grade" class="text-danger"></span>
+            </div>
+
+            <div class="col-12">
+                <label asp-for="StudentIds" class="form-label"></label>
+                <select asp-for="StudentIds" class="form-select" asp-items="Model.Students" multiple size="12"></select>
+                <div class="form-text">Hold Ctrl/Cmd (or Shift) to select multiple students.</div>
+                <span asp-validation-for="StudentIds" class="text-danger"></span>
+            </div>
+
+            <div class="col-12 d-flex gap-2">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-people-fill me-1"></i> Enroll selected students</button>
+                <a class="btn btn-outline-secondary" asp-action="Index">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
