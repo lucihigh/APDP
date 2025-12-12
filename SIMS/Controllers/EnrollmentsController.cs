@@ -28,10 +28,41 @@ namespace SIMS.Controllers
         }
 
         // GET: Enrollments
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? courseCode, string? semester, string? student)
         {
-            var applicationDbContext = _context.Enrollments.Include(e => e.Course).Include(e => e.Student);
-            return View(await applicationDbContext.ToListAsync());
+            var query = _context.Enrollments
+                .AsNoTracking()
+                .Include(e => e.Course)
+                .Include(e => e.Student)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(courseCode))
+            {
+                query = query.Where(e => e.Course!.Code.Contains(courseCode));
+            }
+
+            if (!string.IsNullOrWhiteSpace(semester))
+            {
+                query = query.Where(e => e.Semester != null && e.Semester.Contains(semester));
+            }
+
+            if (!string.IsNullOrWhiteSpace(student))
+            {
+                var term = student.Trim();
+                query = query.Where(e =>
+                    (e.Student!.Email != null && e.Student.Email.Contains(term)) ||
+                    (e.Student.FirstName + " " + e.Student.LastName).Contains(term));
+            }
+
+            ViewBag.CourseCode = courseCode;
+            ViewBag.Semester = semester;
+            ViewBag.Student = student;
+            ViewBag.CourseOptions = await _context.Courses
+                .OrderBy(c => c.Code)
+                .Select(c => new SelectListItem { Value = c.Code, Text = $"{c.Code} - {c.Name}" })
+                .ToListAsync();
+
+            return View(await query.ToListAsync());
         }
 
         // GET: Enrollments/Details/5

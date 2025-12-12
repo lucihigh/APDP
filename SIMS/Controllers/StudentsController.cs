@@ -11,6 +11,7 @@ using SIMS.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Globalization;
 
 namespace SIMS.Controllers
 {
@@ -315,7 +316,7 @@ namespace SIMS.Controllers
         [Authorize(Roles = "Student")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateProfile([Bind("Id,FirstName,LastName,DateOfBirth,Phone,Address")] Student input)
+        public async Task<IActionResult> UpdateProfile([Bind("Id,FirstName,LastName,Phone,Address")] Student input)
         {
             var user = await _userManager.GetUserAsync(User);
             var student = await _context.Students.FirstOrDefaultAsync(s => s.Id == input.Id && s.UserId == user!.Id);
@@ -323,17 +324,39 @@ namespace SIMS.Controllers
             ModelState.Remove(nameof(Student.Email));
             ModelState.Remove(nameof(Student.Program));
             ModelState.Remove(nameof(Student.Year));
+            ModelState.Remove(nameof(Student.DateOfBirth));
+
+            DateOnly? parsedDob = student.DateOfBirth;
+            var dobText = Request.Form["DateOfBirth"].ToString();
+            if (!string.IsNullOrWhiteSpace(dobText))
+            {
+                var formats = new[] { "yyyy-MM-dd", "dd/MM/yyyy", "MM/dd/yyyy" };
+                if (DateTime.TryParseExact(dobText, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dt))
+                {
+                    parsedDob = DateOnly.FromDateTime(dt);
+                }
+                else
+                {
+                    ModelState.AddModelError(nameof(Student.DateOfBirth), "Invalid date format.");
+                }
+            }
+            else
+            {
+                parsedDob = null;
+            }
             if (!ModelState.IsValid)
             {
                 TempData["Error"] = "Please fix the highlighted fields.";
                 // Preserve immutable fields for display
                 input.Program = student.Program;
                 input.Year = student.Year;
+                input.DateOfBirth = parsedDob;
+                input.Email = student.Email;
                 return View(input);
             }
             student.FirstName = input.FirstName;
             student.LastName = input.LastName;
-            student.DateOfBirth = input.DateOfBirth;
+            student.DateOfBirth = parsedDob;
             student.Phone = input.Phone;
             student.Address = input.Address;
             await _context.SaveChangesAsync();

@@ -274,57 +274,57 @@ public class AdminController : Controller
             return View();
         }
 
-        foreach (var row in distinctRows)
-        {
-            var (email, first, last, program, phone, address, year, gpa, dob) = row;
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
-            {
-                var userId = await UserIdGenerator.GenerateForRoleAsync(_userManager, "Student");
-                user = new IdentityUser
-                {
-                    Id = userId,
-                    UserName = email,
-                    Email = email,
-                    EmailConfirmed = true
-                };
-                await _userManager.CreateAsync(user, "Student#12345");
-                await _userManager.AddToRoleAsync(user, "Student");
-                created++;
-            }
-            else
-            {
-                if (!UserIdGenerator.IsFormatted(user.Id, "Student"))
-                {
-                    user = await UserIdRepairService.RepairSingleStudentAsync(_db, _userManager, user, "Student");
-                }
-                updated++;
-            }
-
-            var student =
-                await _db.Students.FirstOrDefaultAsync(s => s.UserId == user.Id)
-                ?? new Student { UserId = user.Id, Email = email };
-
-            student.FirstName = first;
-            student.LastName = last;
-            student.Program = program;
-            student.Year = year;
-            student.Email = email;
-            student.Phone = phone;
-            student.Address = address;
-            student.GPA = gpa;
-            student.DateOfBirth = dob;
-
-            _db.Students.Update(student);
-        }
-
         try
         {
+            foreach (var row in distinctRows)
+            {
+                var (email, first, last, program, phone, address, year, gpa, dob) = row;
+                var user = await _userManager.FindByEmailAsync(email);
+                if (user == null)
+                {
+                    var userId = await UserIdGenerator.GenerateForRoleAsync(_userManager, "Student");
+                    user = new IdentityUser
+                    {
+                        Id = userId,
+                        UserName = email,
+                        Email = email,
+                        EmailConfirmed = true
+                    };
+                    await _userManager.CreateAsync(user, "Student#12345");
+                    await _userManager.AddToRoleAsync(user, "Student");
+                    created++;
+                }
+                else
+                {
+                    if (!UserIdGenerator.IsFormatted(user.Id, "Student"))
+                    {
+                        user = await UserIdRepairService.RepairSingleStudentAsync(_db, _userManager, user, "Student");
+                    }
+                    updated++;
+                }
+
+                var student =
+                    await _db.Students.FirstOrDefaultAsync(s => s.UserId == user.Id)
+                    ?? new Student { UserId = user.Id, Email = email };
+
+                student.FirstName = first;
+                student.LastName = last;
+                student.Program = program;
+                student.Year = year;
+                student.Email = email;
+                student.Phone = phone;
+                student.Address = address;
+                student.GPA = gpa;
+                student.DateOfBirth = dob;
+
+                _db.Students.Update(student);
+            }
+
             await _db.SaveChangesAsync();
         }
-        catch (DbUpdateException)
+        catch (Exception)
         {
-            ModelState.AddModelError(string.Empty, "Failed to save data. Please check for duplicate emails or invalid values in the file.");
+            ModelState.AddModelError(string.Empty, "Invalid file or data. Please check the template and try again.");
             return View();
         }
         TempData["Success"] = $"Imported: {created} created, {updated} users updated";

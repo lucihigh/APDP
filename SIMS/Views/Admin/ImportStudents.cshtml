@@ -7,6 +7,7 @@
             <div class="card-header bg-transparent fw-semibold"><i class="bi bi-file-earmark-arrow-up me-2"></i>Import Students (CSV)</div>
             <div class="card-body">
                 <form method="post" enctype="multipart/form-data" class="row g-3">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <div class="col-12">
                         <input type="file" name="file" class="form-control" accept=".csv" required />
                         <div class="form-text">
