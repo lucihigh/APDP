@@ -96,6 +96,12 @@ namespace SIMS.Controllers
                 return View(input);
             }
 
+            if (await _context.Students.AsNoTracking().AnyAsync(s => s.Email == input.Email))
+            {
+                ModelState.AddModelError(nameof(Student.Email), "A student with this email already exists.");
+                return View(input);
+            }
+
             var studentUser = await _userManager.FindByEmailAsync(input.Email);
             string? generatedPassword = null;
             const string role = "Student";
