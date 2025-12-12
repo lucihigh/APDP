@@ -1,6 +1,7 @@
 using System;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.Sqlite;
 
 namespace SIMS.Data;
 
@@ -21,6 +22,38 @@ public static class SeedData
         {
             // In fallback/ensure-created mode we don't apply migrations; just ensure schema exists.
             await db.Database.EnsureCreatedAsync();
+
+            // Safety: if a stale app.db was shipped, EnsureCreated() won't add missing tables.
+            // Detect common missing tables and recreate the SQLite DB to avoid runtime crashes.
+            var providerName = db.Database.ProviderName ?? string.Empty;
+            if (providerName.Contains("Sqlite", StringComparison.OrdinalIgnoreCase))
+            {
+                try
+                {
+                    var conn = db.Database.GetDbConnection();
+                    var openedHere = conn.State != System.Data.ConnectionState.Open;
+                    if (openedHere) await conn.OpenAsync();
+                    try
+                    {
+                        await using var cmd = conn.CreateCommand();
+                        cmd.CommandText = "SELECT name FROM sqlite_master WHERE type='table' AND name='FacultyProfiles'";
+                        var hasFacultyProfiles = await cmd.ExecuteScalarAsync() is string;
+                        if (!hasFacultyProfiles)
+                        {
+                            await db.Database.EnsureDeletedAsync();
+                            await db.Database.EnsureCreatedAsync();
+                        }
+                    }
+                    finally
+                    {
+                        if (openedHere) await conn.CloseAsync();
+                    }
+                }
+                catch
+                {
+                    // If detection fails, continue; later operations will surface issues.
+                }
+            }
         }
 
         // Remove orphaned user-role links to avoid FK violations when roles/users are recreated

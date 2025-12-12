@@ -1,3 +1,5 @@
 .vs/
 bin/
 obj/
+app.db
+*.db
