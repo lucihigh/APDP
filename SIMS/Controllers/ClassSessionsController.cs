@@ -15,6 +15,7 @@ namespace SIMS.Controllers
     public class ClassSessionsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private const string DuplicateSessionMessage = "A session for this course/day/slot already exists during the selected date range.";
 
         public ClassSessionsController(ApplicationDbContext context)
         {
@@ -70,12 +71,31 @@ namespace SIMS.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,CourseId,DayOfWeek,SessionSlot,StartTime,EndTime,Location")] ClassSession classSession)
         {
+            // Always create a new row; ignore any posted Id.
+            classSession.Id = 0;
+
             // Backward compatibility: if an older UI didn't post SessionSlot, default to slot 1.
             if (classSession.SessionSlot < 1 || classSession.SessionSlot > 6)
             {
                 classSession.SessionSlot = 1;
                 ModelState.Remove(nameof(ClassSession.SessionSlot));
                 TryValidateModel(classSession);
+            }
+
+            if (ModelState.IsValid)
+            {
+                if (classSession.EndTime < classSession.StartTime)
+                {
+                    ModelState.AddModelError(nameof(ClassSession.EndTime), "End date must be on or after start date.");
+                }
+                else
+                {
+                    var overlapExists = await HasOverlappingSessionAsync(classSession);
+                    if (overlapExists)
+                    {
+                        ModelState.AddModelError(string.Empty, DuplicateSessionMessage);
+                    }
+                }
             }
 
             if (ModelState.IsValid)
@@ -127,6 +147,22 @@ namespace SIMS.Controllers
                 classSession.SessionSlot = 1;
                 ModelState.Remove(nameof(ClassSession.SessionSlot));
                 TryValidateModel(classSession);
+            }
+
+            if (ModelState.IsValid)
+            {
+                if (classSession.EndTime < classSession.StartTime)
+                {
+                    ModelState.AddModelError(nameof(ClassSession.EndTime), "End date must be on or after start date.");
+                }
+                else
+                {
+                    var overlapExists = await HasOverlappingSessionAsync(classSession, excludeId: classSession.Id);
+                    if (overlapExists)
+                    {
+                        ModelState.AddModelError(string.Empty, DuplicateSessionMessage);
+                    }
+                }
             }
 
             if (ModelState.IsValid)
@@ -192,6 +228,19 @@ namespace SIMS.Controllers
         private bool ClassSessionExists(int id)
         {
             return _context.ClassSessions.Any(e => e.Id == id);
+        }
+
+        private Task<bool> HasOverlappingSessionAsync(ClassSession classSession, int? excludeId = null)
+        {
+            return _context.ClassSessions
+                .AsNoTracking()
+                .AnyAsync(cs =>
+                    (!excludeId.HasValue || cs.Id != excludeId.Value) &&
+                    cs.CourseId == classSession.CourseId &&
+                    cs.DayOfWeek == classSession.DayOfWeek &&
+                    cs.SessionSlot == classSession.SessionSlot &&
+                    cs.StartTime <= classSession.EndTime &&
+                    cs.EndTime >= classSession.StartTime);
         }
 
         private static IEnumerable<object> GetDayOptions()
